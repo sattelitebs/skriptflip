@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.env*
+!.env.example
+README.md
+SESSION_HANDOFF.md
+CLAUDE.md
+AGENTS.md
+.claude
+.vscode
+.idea
+*.log
+server-secrets
+scripts/seed-keys.ts
