@@ -58,12 +58,12 @@ export async function POST(request: Request) {
 
   if (logErr) {
     console.error("[digistore] event-log-insert failed:", logErr.message);
-    return new Response("Logged: ok\n", { status: 200 });
+    return okResponse();
   }
 
   if (!sig.ok) {
     console.warn("[digistore] invalid signature for event", event, "order", orderId);
-    return new Response("Logged: invalid signature\n", { status: 200 });
+    return okResponse();
   }
 
   // Event verarbeiten
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
         process_error: outcome.processed ? null : outcome.message,
       })
       .eq("id", eventRow.id);
-    return new Response(`OK: ${outcome.message}\n`, { status: 200 });
+    return okResponse();
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown error";
     console.error("[digistore] handler crashed:", message);
@@ -84,16 +84,23 @@ export async function POST(request: Request) {
       .from("digistore_events")
       .update({ processed_ok: false, process_error: message })
       .eq("id", eventRow.id);
-    return new Response(`Logged: handler-error: ${message}\n`, { status: 200 });
+    return okResponse();
   }
 }
 
 /**
- * GET-Handler für manuelle Connection-Tests aus dem Browser.
- * Antwortet mit „OK" damit du einfach prüfen kannst dass die Route lebt.
+ * GET-Handler für manuelle Browser-Aufrufe.
+ * Auch hier „OK" damit Digistore-Erfolgserkennung beim Connection-Test zufrieden ist.
  */
 export async function GET() {
-  return new Response("digistore-webhook alive\n", { status: 200 });
+  return okResponse();
+}
+
+function okResponse() {
+  // Digistore-IPN „Standard (erwartet Text: OK)" verlangt Body, der mit „OK" beginnt.
+  // Wir antworten immer „OK", egal ob Signatur gut/schlecht oder Handler-Fehler —
+  // der echte Status steht im Audit-Log `digistore_events`.
+  return new Response("OK", { status: 200 });
 }
 
 function parseFormBody(body: string): Record<string, string> {
