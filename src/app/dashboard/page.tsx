@@ -70,7 +70,39 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {!access.blocked && !access.hasAllKeys && (
+      {!access.blocked && !access.isAdmin && !access.license.isActive && (
+        <div className="mb-6 rounded-2xl border border-orange-700 bg-orange-900/10 p-6">
+          <p className="mb-1 text-sm font-bold uppercase tracking-wide text-orange-400">
+            {licenseBannerHeadline(access.license.status)}
+          </p>
+          <p className="mb-4 text-sm text-orange-100">
+            {licenseBannerBody(access.license.status)}
+          </p>
+          <a
+            href="https://skriptflip.com#preise"
+            className="inline-block rounded-md bg-[var(--color-brand)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-black transition hover:brightness-95"
+          >
+            Lifetime sichern →
+          </a>
+        </div>
+      )}
+
+      {!access.blocked && access.license.isActive && !access.isAdmin && access.license.type && (
+        <div className="mb-6 rounded-2xl border border-emerald-700/50 bg-emerald-900/10 p-4">
+          <p className="text-sm text-emerald-200">
+            <span className="font-bold uppercase tracking-wide text-emerald-400">
+              {access.license.type === "lifetime" ? "Lifetime aktiv" : "Jahresabo aktiv"}
+            </span>
+            {access.license.type === "yearly" && access.license.validUntil && (
+              <span className="ml-2 text-emerald-300/80">
+                läuft bis {formatDate(access.license.validUntil)}
+              </span>
+            )}
+          </p>
+        </div>
+      )}
+
+      {!access.blocked && access.license.isActive && !access.hasAllKeys && (
         <div className="mb-6 rounded-2xl border border-amber-700 bg-amber-900/10 p-6">
           <p className="mb-1 text-sm font-bold uppercase tracking-wide text-amber-400">
             Setup unvollständig
@@ -95,7 +127,9 @@ export default async function DashboardPage() {
           Füge einen TikTok-, Instagram- oder YouTube-Link ein. Die KI legt los und liefert
           dir Transkript, Hook-Analyse und 3 eigene Skript-Versionen.
         </p>
-        <AnalyzeForm disabled={!access.hasAllKeys || access.blocked} />
+        <AnalyzeForm
+          disabled={!access.hasAllKeys || access.blocked || !access.license.isActive}
+        />
       </div>
 
       <div className="mt-10">
@@ -104,4 +138,28 @@ export default async function DashboardPage() {
       </div>
     </div>
   );
+}
+
+function licenseBannerHeadline(status: string | null): string {
+  if (status === "expired" || status === "cancelled") return "Lizenz abgelaufen";
+  if (status === "refunded") return "Lizenz rückerstattet";
+  return "Noch keine Lizenz";
+}
+
+function licenseBannerBody(status: string | null): string {
+  if (status === "expired" || status === "cancelled") {
+    return "Deine Lizenz ist nicht mehr aktiv. Verlängere oder buche neu, um wieder zu generieren.";
+  }
+  if (status === "refunded") {
+    return "Deine Lizenz wurde rückerstattet. Du kannst aktuell nicht generieren.";
+  }
+  return "Hol dir deine Lifetime- oder Jahres-Lizenz, dann kannst du sofort loslegen.";
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 }

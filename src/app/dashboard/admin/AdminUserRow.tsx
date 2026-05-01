@@ -13,6 +13,9 @@ export type AdminUser = {
   analyses_count: number;
   has_openai_key: boolean;
   has_anthropic_key: boolean;
+  license_type: "lifetime" | "yearly" | null;
+  license_status: "active" | "cancelled" | "expired" | "refunded" | null;
+  license_valid_until: string | null;
 };
 
 function formatDate(iso: string | null): string {
@@ -80,6 +83,9 @@ export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf
           </span>
         </div>
       </td>
+      <td className="px-4 py-3">
+        <LicenseBadge user={user} />
+      </td>
       <td className="px-4 py-3 text-zinc-300">{user.analyses_count}</td>
       <td className="px-4 py-3 text-zinc-400">{formatDate(user.last_activity_at)}</td>
       <td className="px-4 py-3">
@@ -118,5 +124,38 @@ export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf
         )}
       </td>
     </tr>
+  );
+}
+
+function LicenseBadge({ user }: { user: AdminUser }) {
+  if (!user.license_type) {
+    return (
+      <span className="rounded-md border border-[var(--color-border)] px-2 py-1 text-xs text-zinc-500">
+        keine
+      </span>
+    );
+  }
+  const isActive =
+    user.license_status === "active" &&
+    (user.license_valid_until === null ||
+      new Date(user.license_valid_until).getTime() > Date.now());
+
+  const tone = isActive
+    ? "border-emerald-700 bg-emerald-900/20 text-emerald-400"
+    : "border-orange-700 bg-orange-900/20 text-orange-400";
+
+  const label = user.license_type === "lifetime" ? "Lifetime" : "Jahresabo";
+  const subline =
+    user.license_type === "yearly" && user.license_valid_until
+      ? `bis ${formatDate(user.license_valid_until)}`
+      : isActive
+        ? "unbefristet"
+        : (user.license_status ?? "");
+
+  return (
+    <div className={`inline-flex flex-col rounded-md border px-2 py-1 ${tone}`}>
+      <span className="text-xs font-bold uppercase tracking-wide">{label}</span>
+      <span className="text-[10px] opacity-80">{subline}</span>
+    </div>
   );
 }

@@ -23,6 +23,13 @@ type KeyRow = { user_id: string; provider: string };
 
 type AnalysisCountRow = { user_id: string; created_at: string };
 
+type LicenseRow = {
+  user_id: string;
+  type: "lifetime" | "yearly";
+  status: "active" | "cancelled" | "expired" | "refunded";
+  valid_until: string | null;
+};
+
 export default async function AdminPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -39,15 +46,19 @@ export default async function AdminPage() {
   }
 
   const admin = createAdminClient();
-  const [profilesRes, keysRes, analysesRes] = await Promise.all([
+  const [profilesRes, keysRes, analysesRes, licensesRes] = await Promise.all([
     admin.from("profiles").select("id, email, role, blocked, created_at").order("created_at", { ascending: false }),
     admin.from("user_api_keys").select("user_id, provider"),
     admin.from("analyses").select("user_id, created_at"),
+    admin.from("licenses").select("user_id, type, status, valid_until"),
   ]);
 
   const profiles = (profilesRes.data ?? []) as ProfileRow[];
   const keys = (keysRes.data ?? []) as KeyRow[];
   const analyses = (analysesRes.data ?? []) as AnalysisCountRow[];
+  const licenses = (licensesRes.data ?? []) as LicenseRow[];
+  const licenseByUser = new Map<string, LicenseRow>();
+  for (const l of licenses) licenseByUser.set(l.user_id, l);
 
   const keysByUser = new Map<string, Set<string>>();
   for (const k of keys) {
@@ -66,6 +77,7 @@ export default async function AdminPage() {
 
   const users: AdminUser[] = profiles.map((p) => {
     const userKeys = keysByUser.get(p.id) ?? new Set<string>();
+    const lic = licenseByUser.get(p.id) ?? null;
     return {
       id: p.id,
       email: p.email,
@@ -76,6 +88,9 @@ export default async function AdminPage() {
       analyses_count: countByUser.get(p.id) ?? 0,
       has_openai_key: userKeys.has("openai"),
       has_anthropic_key: userKeys.has("anthropic"),
+      license_type: lic?.type ?? null,
+      license_status: lic?.status ?? null,
+      license_valid_until: lic?.valid_until ?? null,
     };
   });
 
@@ -103,6 +118,7 @@ export default async function AdminPage() {
               <th className="px-4 py-3 text-left">Email</th>
               <th className="px-4 py-3 text-left">Rolle</th>
               <th className="px-4 py-3 text-left">Keys</th>
+              <th className="px-4 py-3 text-left">Lizenz</th>
               <th className="px-4 py-3 text-left">Analysen</th>
               <th className="px-4 py-3 text-left">Letzte Aktivität</th>
               <th className="px-4 py-3 text-left">Status</th>
@@ -115,7 +131,7 @@ export default async function AdminPage() {
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-zinc-500">
+                <td colSpan={8} className="px-4 py-12 text-center text-zinc-500">
                   Keine User gefunden.
                 </td>
               </tr>

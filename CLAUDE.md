@@ -59,8 +59,8 @@
   - Lifetime Earlybird: **197€**
   - Lifetime regulär (nach Earlybird-Phase): **297€**
   - Jahresabo: **97€/Jahr**
-- **User bringt eigene API-Keys** (OpenAI + Claude). Speicherung verschlüsselt in DB, Pipelines nutzen User-Keys statt zentrale env. Du (Torsten) zahlst nur Hosting (~10-30€/Mon DigitalOcean), keine API-Kosten.
-- **Hosting:** DigitalOcean Droplet (12$/Mon, 4GB) + Coolify als Deploy-Layer. NICHT Vercel (yt-dlp braucht Long-Running-Prozesse).
+- **User bringt eigene API-Keys** (OpenAI + Claude). Speicherung verschlüsselt in DB, Pipelines nutzen User-Keys statt zentrale env. Du (Torsten) zahlst nur Hosting (~8,50 €/Mon Hetzner), keine API-Kosten.
+- **Hosting:** Hetzner Cloud CPX22 (8,49 €/Mon, 4GB RAM, 2 vCPU, Datacenter Nürnberg) + Coolify als Deploy-Layer. DSGVO-Plus für deutsche User. NICHT Vercel (yt-dlp braucht Long-Running-Prozesse).
 
 ### Member-System
 - User loggt sich in skriptflip.com ein → Settings-Bereich → API-Keys einfügen → Pipelines aktiv
