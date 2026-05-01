@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { verifyDigistoreSignature } from "@/lib/digistore/verify";
+import { verifyDigistoreSignature, computeDigistoreSignature } from "@/lib/digistore/verify";
 import { handleDigistoreEvent } from "@/lib/digistore/handler";
 
 export const runtime = "nodejs";
@@ -38,10 +38,12 @@ export async function POST(request: Request) {
   const buyerEmail = (params.email ?? params.address_email ?? "").toLowerCase() || null;
 
   const sig = verifyDigistoreSignature(params, passphrase);
+  const expectedSig = computeDigistoreSignature(params, passphrase);
 
   const admin = createAdminClient();
 
-  // Erst Event loggen — auch bei ungültiger Signatur, damit nichts verloren geht
+  // Erst Event loggen — auch bei ungültiger Signatur, damit nichts verloren geht.
+  // _debug-Felder im raw helfen Algorithmus-Diff zu sehen, wenn Sigs nicht matchen.
   const { data: eventRow, error: logErr } = await admin
     .from("digistore_events")
     .insert({
@@ -49,7 +51,12 @@ export async function POST(request: Request) {
       order_id: orderId,
       product_id: productId,
       buyer_email: buyerEmail,
-      raw: params,
+      raw: {
+        ...params,
+        _debug_raw_body: rawBody,
+        _debug_expected_sig_lower: expectedSig,
+        _debug_param_keys_in_order: Object.keys(params),
+      },
       signature_ok: sig.ok,
       processed_ok: false,
     })
