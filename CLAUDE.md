@@ -83,10 +83,13 @@ Code-seitig komplett. Offen: 005-Migration in Supabase ausführen, eigenen User 
 7. Digistore-Webhook-Endpoint `/api/webhooks/digistore` → Lizenz-Aktivierung
 8. Auth-Gating in Pipelines: keine aktive Lizenz = 403, Hinweis auf Verkaufsseite
 
-### Phase C — Server-Setup (~5h)
-9. ~~Auth-Confirm-Bug~~ ✓ gefixt (2026-04-30)
-10. DigitalOcean Droplet aufsetzen + Coolify installieren (Schritt-für-Schritt)
-11. Domain `skriptflip.com` auf Droplet, SSL via Let's Encrypt automatisch via Coolify
+### Phase C — Server-Setup ✓ ERLEDIGT (2026-05-01)
+- ~~Auth-Confirm-Bug~~ ✓ gefixt
+- ~~Server~~ ✓ Hetzner CPX22 Nürnberg (8,49 €/Mo) statt DigitalOcean
+- ~~Coolify~~ ✓ v4.0.0 läuft auf 178.105.60.119:8000
+- ~~Domain~~ ✓ skriptflip.com + www auf Server-IP, SSL via Let's Encrypt
+- ~~Deploy~~ ✓ via GitHub-Repo sattelitebs/skriptflip + Dockerfile (yt-dlp + ffmpeg + Node 22)
+- ~~Supabase URL-Config~~ ✓ auf https://skriptflip.com
 
 ### Phase D — HeyGen-Integration (~13-17h, separates Feature)
 12. DB-Schema: `heygen_videos` Tabelle + Storage-Bucket `videos`
