@@ -105,6 +105,7 @@ Code-seitig komplett. Offen: 005-Migration in Supabase ausführen, eigenen User 
 20. Dankesseite + Onboarding-Mails
 
 ## Stil-Regeln (vom User)
+- **PFLICHT vor jeder Copy/Seite/Funnel:** `docs/persona-torsten-jaeger.md` lesen — Story, Tonalität, Zielgruppe, Schmerzpunkte, Markenkern. Verbindliche Stimme: direkt, ehrlich, Du-Form, „ohne Bullshit", erfahrener Freund statt Guru.
 - Komplett deutsch
 - Brand-Farben: Gelb `#FEDC31`, Schwarz `#000`, Weiß (NICHT mit Empire-Lila verwechseln — das ist andere Marke)
 - Bold All-Caps für Hooks
