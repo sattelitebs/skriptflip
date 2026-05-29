@@ -125,18 +125,19 @@ export default function Home() {
             </h2>
             <div className="mt-5 space-y-4 text-zinc-300">
               <p>
-                Ich helfe Creatorn, Coaches und Selbstständigen, mit Kurzvideos ein Business
-                aufzubauen, das mit ihnen wächst — und Content ist dabei der eine Hebel, der alles
-                andere erst möglich macht.
+                Ich komme nicht aus der Theorie, sondern aus der Praxis. Seit Jahren zeige ich
+                normalen Menschen, wie sie mit KI und Online-Marketing sichtbar werden und verkaufen
+                — ohne Tech-Überforderung und ohne sich jeden Tag vor die Kamera zu zwingen.
               </p>
               <p>
-                Über die Jahre habe ich gemerkt: Das, was wirklich verkauft, ist kein Glück, sondern
-                ein <strong className="text-white">wiederholbares System</strong>.{" "}
-                <strong className="text-white">skriptflip ist die Maschine, die ich mir dafür gebaut habe.</strong>
+                Eins habe ich dabei tausendmal gesehen: Es scheitert fast nie am Wissen. Es
+                scheitert daran, dass die Leute zu viel sammeln und zu wenig veröffentlichen.{" "}
+                <strong className="text-white">Du brauchst nicht noch ein Tool — du brauchst ein System.</strong>{" "}
+                skriptflip ist die Maschine, die ich mir dafür gebaut habe.
               </p>
               <p>
-                Im Webinar zeige ich dir das ganze System live — damit du nicht mehr raten musst,
-                was funktioniert, sondern weißt, warum.
+                Im Webinar zeige ich dir genau dieses System live — damit du nicht mehr rätst, was
+                funktioniert, sondern weißt, warum. Und damit du endlich ins Handeln kommst.
               </p>
             </div>
             <a
@@ -146,6 +147,25 @@ export default function Home() {
               Ich bin dabei →
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* Für wen das ist */}
+      <section className="py-20">
+        <div className="mx-auto max-w-3xl px-6">
+          <h2 className="text-center text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Das hier ist für dich, <span className="text-[var(--color-brand)]">wenn…</span>
+          </h2>
+          <ul className="mx-auto mt-10 grid max-w-2xl gap-3">
+            <For>du schon Kurse gekauft hast, aber nie wirklich was veröffentlicht hast.</For>
+            <For>du dich im Tool-Chaos verlierst, statt einfach zu posten.</For>
+            <For>du sichtbar werden willst — aber nicht jeden Tag vor die Kamera.</For>
+            <For>du Likes bekommst, aber keine Käufer.</For>
+            <For>du endlich ins Handeln kommen willst — mit einem klaren System statt noch mehr Theorie.</For>
+          </ul>
+          <p className="mx-auto mt-8 max-w-xl text-center text-zinc-400">
+            Du musst nicht perfekt starten. Du musst sichtbar werden — und verkaufen.
+          </p>
         </div>
       </section>
 
@@ -179,6 +199,17 @@ function Lever({ n, title, desc }: { n: string; title: string; desc: string }) {
       <h3 className="mt-5 text-2xl font-black uppercase tracking-tight">{title}</h3>
       <p className="mt-3 text-sm text-zinc-400">{desc}</p>
     </div>
+  );
+}
+
+function For({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-5 py-4">
+      <span className="mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center rounded-full bg-[var(--color-brand)] text-xs font-black text-black">
+        ✓
+      </span>
+      <span className="text-zinc-200">{children}</span>
+    </li>
   );
 }
 
