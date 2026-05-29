@@ -51,6 +51,41 @@
 
 **Neue env-Variable:** `API_KEY_ENCRYPTION_SECRET` (64 Hex-Zeichen, generiert via `openssl rand -hex 32`). MUSS auf Production identisch sein, sonst sind alle gespeicherten Keys unbrauchbar.
 
+## Stand 2026-05-29 — Webinar-Funnel + Lizenz/Onboarding LIVE
+
+**Alles auf `main` gemergt und via Coolify auf skriptflip.com deployt.**
+
+### Webinar-Funnel (Startseite)
+- Startseite `src/app/page.tsx` ist die **Webinar-Opt-in-Seite** (3-Hebel-Story Radar/Hook/Verkauf, USP „viraler Content, der verkauft").
+- Anmeldung über **4leads-Formular als Popup** (`src/components/WebinarSignupModal.tsx`): Button öffnet Overlay, Schließen per X / Backdrop / Escape. Das Formular ist ein 4leads-**iframe** (cross-origin → Feld- und Anzeige-Logik NUR in 4leads konfigurierbar, nicht im App-Code; rotes •••-Kästchen war ein Browser-Passwortmanager, kein Bug).
+- **Terminierung + ALLE Webinar-Mails laufen über WebinarJam** (4leads erfasst den Lead und übergibt an WebinarJam). Nicht im App-Code.
+- Dankeseite `/danke` (`src/app/danke/page.tsx`, noindex) — Redirect-Ziel nach Anmeldung.
+- Verkaufsseite `/angebot` (`src/app/angebot/page.tsx`): Digistore-Produkt **646049** verdrahtet (alle 3 Preis-Stufen zeigen vorerst dasselbe Produkt; verbindlicher Preis steht auf der Digistore-Bestellseite). Preis-Zahlen auf der Seite sind Platzhalter — **Preis war 2026-05-29 noch nicht final**.
+
+### Viral-Research-Tool (PR #1)
+- `/dashboard/viral-research`: Nischen-Scan → Sales-Radar (Bewertung nach Verkaufspotenzial statt Reichweite) → 3 Skripte je Treffer in `analyses`. Hybrid-Datenquelle YouTube Data API (`YOUTUBE_API_KEY`) + optional Apify (`APIFY_TOKEN`).
+
+### Lizenz + Kunden-Onboarding (= Phase B, fertig)
+- `licenses` + `pending_licenses` + `digistore_events`; `src/lib/auth/access.ts` (Gating + claim-on-login).
+- Digistore-Webhook `/api/webhooks/digistore` (SHA-512-Sig, Event-Routing, idempotent gegen Retries).
+- **Kauf → Auto-Account + Zugangs-Mail:** `src/lib/auth/provision.ts` — kein Account → Supabase `inviteUserByEmail` (Passwort-Mail), Account vorhanden → Magic-Link. Versand über Supabase-Auth-Templates (Resend-SMTP), kein separater Key.
+- **Set-Password-Seite** `/auth/set-password`; `auth/confirm` leitet invite/recovery dorthin.
+- **Admin** `/dashboard/admin`: sperren/entsperren, Admin-Rolle, **Lizenz vergeben (Lifetime/Jahr) + Mail**, „Lizenz entziehen", „Mail erneut".
+
+### Mail-Vorlagen
+- `docs/webinar-mailsequenz.md`: 8 Webinar-Mails (4 vor / 4 nach → in WebinarJam) + Cart-Abandon (9) + Post-Sale-Onboarding (10).
+
+### Neue env-Variablen (Coolify-Prod setzen)
+- `DIGISTORE_PASSPHRASE`, `DIGISTORE_LIFETIME_PRODUCT_IDS`, `DIGISTORE_YEARLY_PRODUCT_IDS`
+- `NEXT_PUBLIC_SITE_URL=https://skriptflip.com`
+- `YOUTUBE_API_KEY` (empfohlen) + optional `APIFY_TOKEN` / `APIFY_*_ACTOR`
+
+### Supabase-Migrationen NEU (ausführen, falls noch nicht): 006_licenses, 007_viral_research_runs, 008_webinar_signups, 010_pending_licenses
+
+### ⚠️ Manuelle Supabase-Konfig, sonst kommen die Onboarding-Mails nicht an (kein Code):
+- Auth → URL Configuration → **Redirect URLs**: `https://skriptflip.com/auth/set-password` + `https://skriptflip.com/dashboard`
+- Auth → **Email-Templates** „Invite user" + „Magic Link" gebrandet/aktiv prüfen
+
 ## Strategische Entscheidungen (gelockt 2026-04-29)
 
 ### Geschäftsmodell
@@ -78,10 +113,12 @@
 ### Phase A — Code-Refactor zu User-API ✓ ERLEDIGT (2026-04-30)
 Code-seitig komplett. Offen: 005-Migration in Supabase ausführen, eigenen User auf admin setzen, Settings-Flow mit echtem User durchtesten.
 
-### Phase B — Lizenz-System (~10-15h)
-6. Tabelle `licenses` (user_id, type [lifetime|yearly], valid_until, digistore_order_id, status)
-7. Digistore-Webhook-Endpoint `/api/webhooks/digistore` → Lizenz-Aktivierung
-8. Auth-Gating in Pipelines: keine aktive Lizenz = 403, Hinweis auf Verkaufsseite
+### Phase B — Lizenz-System ✓ ERLEDIGT (2026-05-29)
+- ~~Tabelle `licenses` + `pending_licenses` + `digistore_events`~~ ✓
+- ~~Digistore-Webhook `/api/webhooks/digistore` → Lizenz-Aktivierung~~ ✓ (SHA-512, idempotent)
+- ~~Auth-Gating: keine aktive Lizenz = gesperrt~~ ✓ (`src/lib/auth/access.ts`)
+- ~~Kauf → Auto-Account + Zugangs-Mail + Admin-Lizenzvergabe~~ ✓ (`src/lib/auth/provision.ts`)
+- Offen: nur noch Live-Test (echter Test-Kauf / Admin-Freischalten) + Supabase-Redirect-URLs/Templates (s. o.)
 
 ### Phase C — Server-Setup ✓ ERLEDIGT (2026-05-01)
 - ~~Auth-Confirm-Bug~~ ✓ gefixt
@@ -98,11 +135,11 @@ Code-seitig komplett. Offen: 005-Migration in Supabase ausführen, eigenen User 
 15. HeyGen-API-Key in User-Settings
 
 ### Phase E — Verkaufsmappe (analog Aivatar Empire, in eigener Session)
-16. Verkaufsseite skriptflip.com (HTML, Brand-Farben Gelb/Schwarz)
-17. Mail-Sequenzen (Pre-Sale, Cart-Abandon, Post-Sale Onboarding)
+16. ~~Verkaufsseite~~ ✓ `/angebot` (Brand Gelb/Schwarz) — Preise final eintragen, wenn entschieden
+17. ~~Mail-Sequenzen~~ ✓ `docs/webinar-mailsequenz.md` (8 Webinar-Mails + Cart-Abandon + Onboarding)
 18. Werbeanzeigen-Texte
 19. Affiliate-Seite Digistore
-20. Dankesseite + Onboarding-Mails
+20. ~~Dankesseite + Onboarding-Mails~~ ✓ `/danke` + Mail 10 (Onboarding)
 
 ## Stil-Regeln (vom User)
 - **PFLICHT vor jeder Copy/Seite/Funnel:** `docs/persona-torsten-jaeger.md` lesen — Story, Tonalität, Zielgruppe, Schmerzpunkte, Markenkern. Verbindliche Stimme: direkt, ehrlich, Du-Form, „ohne Bullshit", erfahrener Freund statt Guru.
