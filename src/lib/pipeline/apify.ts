@@ -19,6 +19,10 @@ export type ReelHit = {
   likes: number | null;
   comments: number | null;
   thumbnailUrl: string | null;
+  // Vom Sales-Radar (Claude) ergänzt — DAS ist die Differenzierung:
+  // nicht „was ist laut", sondern „was zieht UND verkauft".
+  sales_score?: number | null;   // 0-100 Verkaufspotenzial
+  sales_angle?: string | null;   // wie sich daraus verkaufen lässt
 };
 
 const ACTORS: Record<Platform, string> = {

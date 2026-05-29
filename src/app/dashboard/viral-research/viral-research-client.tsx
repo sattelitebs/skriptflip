@@ -14,12 +14,15 @@ type ReelHit = {
   likes: number | null;
   comments: number | null;
   thumbnailUrl: string | null;
+  sales_score: number | null;
+  sales_angle: string | null;
 };
 
 type NicheAnalysis = {
   summary: string;
-  top_patterns: string[];
-  common_hooks: string[];
+  radar: string[];
+  hooks: string[];
+  verkauf: string[];
   content_gaps: string[];
   recommendation: string;
 };
@@ -183,8 +186,9 @@ export default function ViralResearchClient({
           </h2>
           <p className="mb-6 text-zinc-300">{analysis.summary}</p>
           <div className="grid gap-6 sm:grid-cols-2">
-            <AnalysisBlock title="Erfolgs-Muster" items={analysis.top_patterns} />
-            <AnalysisBlock title="Hooks, die ziehen" items={analysis.common_hooks} />
+            <AnalysisBlock title="Radar — zieht UND verkauft" items={analysis.radar} />
+            <AnalysisBlock title="Hook — 3-Sekunden-Stopper" items={analysis.hooks} />
+            <AnalysisBlock title="Verkauf — ohne Werbe-Sound" items={analysis.verkauf} />
             <AnalysisBlock title="Content-Lücken (Chancen)" items={analysis.content_gaps} />
             <div>
               <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-zinc-500">
@@ -199,27 +203,49 @@ export default function ViralResearchClient({
       {/* Reel-Grid */}
       {reels.length > 0 && (
         <div>
-          <h2 className="mb-4 text-xl font-bold">
-            Die {reels.length} viralsten Videos —{" "}
+          <h2 className="mb-1 text-xl font-bold">
+            Die {reels.length} verkaufsstärksten Videos —{" "}
             <span className="text-zinc-500">{PLATFORM_LABELS[run!.platform]}</span>
           </h2>
+          <p className="mb-4 text-sm text-zinc-500">
+            Sortiert nach Verkaufspotenzial, nicht nach reiner Reichweite.
+          </p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {reels.map((reel, i) => (
               <div
                 key={reel.url + i}
                 className="flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-5"
               >
-                <div className="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-wide text-zinc-400">
-                  <span>▶ {formatCount(reel.views)}</span>
-                  <span>♥ {formatCount(reel.likes)}</span>
-                  <span>💬 {formatCount(reel.comments)}</span>
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  {reel.sales_score != null ? (
+                    <span
+                      className="rounded-md bg-[var(--color-brand)] px-2 py-1 text-xs font-black uppercase tracking-wide text-black"
+                      title="Verkaufspotenzial (Sales-Radar)"
+                    >
+                      Verkauf {reel.sales_score}/100
+                    </span>
+                  ) : (
+                    <span />
+                  )}
+                  <span className="text-xs font-bold uppercase tracking-wide text-zinc-500">
+                    {formatCount(reel.views)} Views
+                  </span>
+                </div>
+                <div className="mb-3 flex items-center gap-3 text-xs uppercase tracking-wide text-zinc-500">
+                  <span>{formatCount(reel.likes)} Likes</span>
+                  <span>{formatCount(reel.comments)} Komm.</span>
                 </div>
                 {reel.author && (
-                  <p className="mb-1 text-sm font-bold text-[var(--color-brand)]">@{reel.author}</p>
+                  <p className="mb-1 text-sm font-bold text-[var(--color-brand)]">{reel.author}</p>
                 )}
-                <p className="mb-4 line-clamp-4 flex-1 text-sm text-zinc-300">
+                <p className="mb-3 line-clamp-3 text-sm text-zinc-300">
                   {reel.caption || "(keine Caption)"}
                 </p>
+                {reel.sales_angle && (
+                  <p className="mb-4 flex-1 rounded-md border border-[var(--color-border)] bg-black/40 p-2 text-xs text-zinc-400">
+                    <span className="font-bold text-zinc-300">Verkaufs-Winkel:</span> {reel.sales_angle}
+                  </p>
+                )}
                 <div className="flex items-center gap-2">
                   <a
                     href={reel.url}

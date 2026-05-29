@@ -104,6 +104,44 @@ OpenAI- (Whisper) und Anthropic-Keys (Analyse/Skripte) kommen wie überall aus d
 | eigene Reel→Skript-Tabellen | Wiederverwendung der bestehenden `analyses`-Tabelle | Voller Downstream (Hooks/Repurpose/Voiceover) ohne Doppelarbeit. |
 | `source-download.ts`, `whisper.ts` als eigene Implementierungen | dünne Wrapper um bestehendes `download.ts` / `transcribe.ts` | DRY — yt-dlp/Whisper existieren schon. |
 
+## 9. Update aus dem Live-Briefing (Content-Radar-Webinar-Modell)
+
+Quelle: Briefing zum Funnel `webinar.contentradar.juliatrost.de` (vom User durchgegeben,
+Seite selbst in dieser Umgebung netzwerkseitig gesperrt). Schärft Positionierung + Architektur:
+
+### Funnel-Modell (Tool-Led-Webinar)
+- **Stufe 1 — Opt-in-Seite:** einziger Zweck = Anmeldung zum kostenlosen Live-Webinar (fester Termin, Zoom). Kein Preis, kein Produkt sichtbar.
+- **Stufe 2 — 60-Min-Webinar:** konkretes Framework (kein Theorievortrag).
+- **Stufe 3 — Reveal bei Minute 60:** Tool wird vorgestellt und verkauft. Auf der Opt-in-Seite bewusst verschwiegen.
+
+### USP — die eine Differenzierung
+Nicht „viraler Content", sondern **„viraler Content, der VERKAUFT"** (vs. „nur laut").
+Positionierung als persönlich gebautes System („die Maschine, die ich mir gebaut habe"),
+nicht als anonyme Software.
+
+### 3 Hebel = Webinar-Dramaturgie UND Feature-Logik
+1. **Radar** — erkennen, welche Themen ziehen UND verkaufen (nicht nur Reichweite).
+2. **Hook** — Hook-Struktur, die in 3 Sekunden über Weiterscrollen entscheidet.
+3. **Verkauf** — im Content selbst verkaufen, ohne dass es nach Werbung wirkt.
+
+### Architektur-Konsequenzen (umgesetzt)
+- **Verkaufspotenzial-Score** statt Reichweiten-Ranking: `niche-analyzer.ts` liefert jetzt das
+  3-Hebel-Gerüst (`radar`/`hooks`/`verkauf`) PLUS pro Treffer einen `sales_score` (0-100) +
+  `sales_angle`. Der Scan re-rankt nach `sales_score`, nicht nach Views. Das „Verkauft"-Signal
+  gibt es in keiner API → kommt aus der Claude-Schicht (= der Moat).
+- **Hybrid-Datenquelle:** `youtube.ts` (offizielle YouTube Data API, gratis, legal) als Rückgrat;
+  Apify optional für IG/TikTok; Auswahl in `viral-research-scan.ts` (`discover()`).
+- `reel-analyzer.ts` um `how_to_sell` erweitert; `script-generation.ts` baut einen dezenten
+  Verkaufs-Move ein und nutzt den `sales_angle`.
+
+### Env ergänzt
+- `YOUTUBE_API_KEY` — offizielle YouTube Data API (Rückgrat). `APIFY_TOKEN` bleibt optional (IG/TikTok).
+
+### Funnel-Seiten (Build „Beides, Tool zuerst")
+- `/webinar` — Opt-in-Anmeldeseite (Tool versteckt), `webhook_signups`-Tabelle + `/api/webinar/signup`.
+- `/angebot` — Verkaufsseite (Post-Webinar-Reveal), Pricing 197/297/97 €.
+- `docs/webinar-skript.md` — 60-Min-Ablauf entlang Radar/Hook/Verkauf, Reveal bei Min. 60.
+
 ## 8. Status / TODO nach diesem Stand
 
 - [ ] `APIFY_TOKEN` in Production-Env (Coolify) + `.env.local` setzen.

@@ -61,6 +61,7 @@ export async function POST(
       meta: { caption: reel.caption, views: reel.views, likes: reel.likes },
       openaiKey,
       anthropicKey,
+      salesAngle: reel.sales_angle ?? null,
     });
     return NextResponse.json({ analysis_id: analysisId });
   } catch (err) {

@@ -2,28 +2,58 @@ import Anthropic from "@anthropic-ai/sdk";
 import { extractJson } from "@/lib/funnels/json-extract";
 import type { ReelHit } from "@/lib/pipeline/apify";
 
+/**
+ * Nischen-Analyse nach dem Radar/Hook/Verkauf-Gerüst (die 3 Hebel).
+ * Die Differenzierung: nicht „was ist laut", sondern „was zieht UND verkauft".
+ */
 export type NicheAnalysis = {
-  summary: string;            // 2-3 Sätze: Zustand der Nische
-  top_patterns: string[];     // wiederkehrende Erfolgs-Muster
-  common_hooks: string[];     // Hook-Typen, die hier ziehen
-  content_gaps: string[];     // unterbespielte Themen / Chancen
-  recommendation: string;     // konkreter nächster Schritt für den User
+  summary: string;        // 2-3 Sätze: Zustand der Nische
+  radar: string[];        // Themen, die ziehen UND verkaufen (vs. nur laut)
+  hooks: string[];        // 3-Sekunden-Hook-Muster, die hier funktionieren
+  verkauf: string[];      // wie im Content verkauft wird, ohne dass es nach Werbung wirkt
+  content_gaps: string[]; // unterbespielte, verkaufsstarke Chancen
+  recommendation: string; // konkreter nächster Schritt
 };
 
-const SYSTEM = `Du bist Viral-Research-Analyst für Kurzvideo-Nischen (TikTok, Reels, Shorts).
-Du bekommst eine Liste der aktuell viralsten Videos einer Nische — mit Caption und Kennzahlen
-(Views, Likes, Kommentare). Leite daraus Muster ab. Rate nicht über Inhalte, die nicht in den
-Daten stehen.
+export type ReelScore = {
+  index: number;
+  sales_score: number;    // 0-100 Verkaufspotenzial
+  sales_angle: string;    // wie sich aus diesem Thema verkaufen lässt
+};
 
-Antworte AUSSCHLIESSLICH mit gültigem JSON in diesem Format, ohne Markdown-Codefences:
+export type NicheRadar = {
+  analysis: NicheAnalysis;
+  scores: ReelScore[];
+};
+
+const SYSTEM = `Du bist „Sales-Radar" — Analyst für Kurzvideo-Nischen (TikTok, Reels, Shorts, YouTube).
+Du bekommst die reichweitenstärksten Videos einer Nische mit Caption und Kennzahlen.
+
+WICHTIG — die Differenzierung: Bewerte NICHT, was nur laut ist (viele Views), sondern was
+zieht UND VERKAUFT. Hohe Reichweite ohne Kaufabsicht der Zielgruppe ist wenig wert.
+
+Liefere zwei Dinge:
+1. Eine Nischen-Analyse nach 3 Hebeln:
+   - radar: Themen/Winkel, die ziehen UND verkaufen (grenze ab gegen reine Reichweite)
+   - hooks: Hook-Muster, die in 3 Sekunden über Weiterscrollen entscheiden
+   - verkauf: wie in diesen Videos im Content selbst verkauft wird, ohne dass es nach Werbung wirkt
+2. Pro Video einen sales_score (0-100 = Verkaufspotenzial) + sales_angle (wie man daraus verkauft).
+
+Antworte AUSSCHLIESSLICH mit gültigem JSON, ohne Markdown-Codefences:
 {
-  "summary": "string",
-  "top_patterns": ["string", "..."],
-  "common_hooks": ["string", "..."],
-  "content_gaps": ["string", "..."],
-  "recommendation": "string"
+  "analysis": {
+    "summary": "string",
+    "radar": ["string", "..."],
+    "hooks": ["string", "..."],
+    "verkauf": ["string", "..."],
+    "content_gaps": ["string", "..."],
+    "recommendation": "string"
+  },
+  "scores": [
+    { "index": 0, "sales_score": 0, "sales_angle": "string" }
+  ]
 }
-Alles auf Deutsch, in DU-Form, ohne Emojis.`;
+Alles auf Deutsch, DU-Form, ohne Emojis. Gib für JEDES Video einen score-Eintrag mit passendem index.`;
 
 function formatReels(reels: ReelHit[]): string {
   return reels
@@ -35,7 +65,7 @@ function formatReels(reels: ReelHit[]): string {
       ]
         .filter(Boolean)
         .join(", ");
-      return `${i + 1}. [${metrics || "keine Kennzahlen"}]${r.author ? ` @${r.author}` : ""}\n   "${r.caption.slice(0, 280)}"`;
+      return `[index ${i}] (${metrics || "keine Kennzahlen"})${r.author ? ` @${r.author}` : ""}\n   "${r.caption.slice(0, 280)}"`;
     })
     .join("\n");
 }
@@ -44,18 +74,18 @@ export async function analyzeNiche(
   reels: ReelHit[],
   niche: string,
   apiKey: string,
-): Promise<NicheAnalysis> {
-  if (reels.length === 0) throw new Error("Keine Reels zum Analysieren vorhanden");
+): Promise<NicheRadar> {
+  if (reels.length === 0) throw new Error("Keine Videos zum Analysieren vorhanden");
 
   const anthropic = new Anthropic({ apiKey });
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 2000,
+    max_tokens: 3000,
     system: SYSTEM,
     messages: [
       {
         role: "user",
-        content: `Nische: "${niche}"\n\nDie ${reels.length} viralsten Videos:\n\n${formatReels(reels)}\n\nLiefere die Nischen-Analyse als JSON.`,
+        content: `Nische: "${niche}"\n\nDie ${reels.length} reichweitenstärksten Videos:\n\n${formatReels(reels)}\n\nLiefere Analyse + sales_score je Video als JSON.`,
       },
     ],
   });
@@ -63,9 +93,12 @@ export async function analyzeNiche(
   const block = response.content.find((b) => b.type === "text");
   if (!block || block.type !== "text") throw new Error("Claude lieferte keinen Text-Block");
 
-  const parsed = extractJson<NicheAnalysis>(block.text);
-  if (!parsed.summary || !Array.isArray(parsed.top_patterns)) {
+  const parsed = extractJson<NicheRadar>(block.text);
+  if (!parsed.analysis?.summary || !Array.isArray(parsed.analysis.radar)) {
     throw new Error("Nischen-Analyse hat unerwartetes Format");
   }
-  return parsed;
+  return {
+    analysis: parsed.analysis,
+    scores: Array.isArray(parsed.scores) ? parsed.scores : [],
+  };
 }

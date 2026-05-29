@@ -12,18 +12,21 @@ export type ReelAnalysis = {
   why_viral: string;          // 2-4 Sätze
   structure: string[];        // Aufbau in Schritten
   retention_tactics: string[];// was Zuschauer hält
+  how_to_sell: string;        // wie man in so einem Content verkauft, ohne dass es nach Werbung wirkt
 };
 
-const SYSTEM = `Du bist Viral-Research-Analyst für Kurzvideos (TikTok, Reels, Shorts).
+const SYSTEM = `Du bist „Sales-Radar" — Analyst für Kurzvideos (TikTok, Reels, Shorts, YouTube).
 Du bekommst das Transkript eines viralen Videos und optionale Kennzahlen.
-Analysiere präzise, WARUM dieses Video funktioniert.
+Analysiere präzise, WARUM es funktioniert — und vor allem, wie sich daraus VERKAUFEN lässt,
+ohne dass es nach Werbung wirkt. Nicht nur „laut", sondern verkaufsstark.
 
 Antworte AUSSCHLIESSLICH mit gültigem JSON in diesem Format, ohne Markdown-Codefences:
 {
   "hook_type": "string",
   "why_viral": "string",
   "structure": ["string", "..."],
-  "retention_tactics": ["string", "..."]
+  "retention_tactics": ["string", "..."],
+  "how_to_sell": "string"
 }
 Alles auf Deutsch, in DU-Form, ohne Emojis.`;
 

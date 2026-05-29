@@ -19,8 +19,9 @@ export async function runViralReelRepurpose(params: {
   meta: ReelMeta;
   openaiKey: string;
   anthropicKey: string;
+  salesAngle?: string | null;
 }): Promise<string> {
-  const { supabase, userId, reelUrl, niche, meta, openaiKey, anthropicKey } = params;
+  const { supabase, userId, reelUrl, niche, meta, openaiKey, anthropicKey, salesAngle } = params;
 
   const { data: row, error: insertErr } = await supabase
     .from("analyses")
@@ -46,7 +47,7 @@ export async function runViralReelRepurpose(params: {
       .eq("id", analysisId);
 
     const analysis = await analyzeReel(transcript, meta, anthropicKey);
-    const scripts = await generateScriptsFromReel(transcript, analysis, niche, anthropicKey);
+    const scripts = await generateScriptsFromReel(transcript, analysis, niche, anthropicKey, salesAngle);
 
     await supabase
       .from("analyses")
