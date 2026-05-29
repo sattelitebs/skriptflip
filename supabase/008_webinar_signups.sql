@@ -9,7 +9,6 @@ create table public.webinar_signups (
   id          uuid primary key default gen_random_uuid(),
   email       text not null unique,
   name        text,
-  slot        text,          -- gewählter Termin-Slot (id aus src/lib/webinar.ts)
   source      text,          -- z.B. 'webinar-optin', Kampagnen-Tag
   created_at  timestamptz not null default now()
 );

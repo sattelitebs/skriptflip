@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import WebinarSignupForm from "@/components/WebinarSignupForm";
-import { WEBINAR_SLOTS } from "@/lib/webinar";
 
 export const metadata: Metadata = {
   title: "Kostenloses Live-Webinar – viraler Content, der verkauft | skriptflip",
@@ -10,6 +8,11 @@ export const metadata: Metadata = {
 
 // Persona hinter dem Webinar – Name hier anpassen.
 const FOUNDER = "Torsten";
+
+// WebinarJam-Registrierungsseite: WebinarJam steuert Termine, Bestätigung und
+// Reminder komplett selbst. Die echte URL via NEXT_PUBLIC_WEBINARJAM_URL setzen
+// (Coolify-Env) — Fallback "#" bis sie eingetragen ist.
+const WEBINARJAM_REGISTER_URL = process.env.NEXT_PUBLIC_WEBINARJAM_URL ?? "#";
 
 export default function Home() {
   return (
@@ -169,7 +172,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Anmeldung mit Termin-Auswahl */}
+      {/* Anmeldung via WebinarJam */}
       <section id="anmelden" className="border-t border-[var(--color-border)] bg-[var(--color-card)] py-20">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <h2 className="text-balance text-3xl font-black uppercase leading-tight sm:text-4xl">
@@ -177,13 +180,21 @@ export default function Home() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Eine Stunde, die deinen Blick auf Content komplett verändert. Kostenfrei, live, mit dem
-            kompletten Tool-Reveal am Ende. {WEBINAR_SLOTS.length} Termine zur Auswahl — nimm den,
-            der dir passt.
+            kompletten Tool-Reveal am Ende. Auf der nächsten Seite suchst du dir den Termin aus, der
+            dir passt — Zugangslink und Erinnerungen bekommst du danach per Mail.
           </p>
 
-          <div className="mx-auto mt-8 max-w-md text-left">
-            <WebinarSignupForm />
-          </div>
+          <a
+            href={WEBINARJAM_REGISTER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-block rounded-full bg-[var(--color-brand)] px-10 py-4 text-base font-bold text-black transition hover:bg-[var(--color-brand-hover)]"
+          >
+            Kostenlos Platz sichern →
+          </a>
+          <p className="mt-4 text-xs text-zinc-500">
+            100 % kostenlos. Kein Verkaufsgespräch. Jederzeit abmeldbar.
+          </p>
         </div>
       </section>
     </>
