@@ -27,13 +27,28 @@ function formatDate(iso: string | null): string {
   });
 }
 
+type PatchPayload = {
+  blocked?: boolean;
+  role?: "user" | "admin";
+  license?: { action: "grant" | "revoke"; type?: "lifetime" | "yearly" };
+  resendEmail?: boolean;
+};
+
 export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [grantType, setGrantType] = useState<"lifetime" | "yearly">("lifetime");
 
-  async function patch(payload: Partial<Pick<AdminUser, "blocked" | "role">>) {
+  const licenseActive =
+    user.license_status === "active" &&
+    (user.license_valid_until === null ||
+      new Date(user.license_valid_until).getTime() > Date.now());
+
+  async function patch(payload: PatchPayload, successNote?: string) {
     setError(null);
+    setNotice(null);
     const res = await fetch(`/api/admin/users/${user.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -44,6 +59,7 @@ export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf
       setError(data.error ?? "Fehler");
       return;
     }
+    if (successNote) setNotice(successNote);
     startTransition(() => router.refresh());
   }
 
@@ -53,6 +69,7 @@ export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf
         <div className="font-mono text-zinc-200">{user.email}</div>
         <div className="text-xs text-zinc-500">seit {formatDate(user.created_at)}</div>
         {error && <div className="mt-1 text-xs text-red-400">{error}</div>}
+        {notice && <div className="mt-1 text-xs text-emerald-400">{notice}</div>}
       </td>
       <td className="px-4 py-3">
         <span
@@ -103,23 +120,74 @@ export default function AdminUserRow({ user, isSelf }: { user: AdminUser; isSelf
         {isSelf ? (
           <span className="text-xs text-zinc-500">Du</span>
         ) : (
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => patch({ blocked: !user.blocked })}
-              disabled={isPending}
-              className="rounded-md border border-[var(--color-border)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] disabled:opacity-50"
-            >
-              {user.blocked ? "Freischalten" : "Sperren"}
-            </button>
-            <button
-              type="button"
-              onClick={() => patch({ role: user.role === "admin" ? "user" : "admin" })}
-              disabled={isPending}
-              className="rounded-md border border-[var(--color-border)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] disabled:opacity-50"
-            >
-              {user.role === "admin" ? "Admin entziehen" : "Admin geben"}
-            </button>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => patch({ blocked: !user.blocked })}
+                disabled={isPending}
+                className="rounded-md border border-[var(--color-border)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] disabled:opacity-50"
+              >
+                {user.blocked ? "Entsperren" : "Sperren"}
+              </button>
+              <button
+                type="button"
+                onClick={() => patch({ role: user.role === "admin" ? "user" : "admin" })}
+                disabled={isPending}
+                className="rounded-md border border-[var(--color-border)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] disabled:opacity-50"
+              >
+                {user.role === "admin" ? "Admin entziehen" : "Admin geben"}
+              </button>
+            </div>
+
+            {/* Lizenz / Zugang */}
+            <div className="flex items-center justify-end gap-2">
+              {licenseActive ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => patch({ resendEmail: true }, "Zugangs-Mail gesendet.")}
+                    disabled={isPending}
+                    className="rounded-md border border-[var(--color-border)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-zinc-200 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)] disabled:opacity-50"
+                  >
+                    Mail erneut
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => patch({ license: { action: "revoke" } })}
+                    disabled={isPending}
+                    className="rounded-md border border-red-800 px-3 py-1 text-xs font-bold uppercase tracking-wide text-red-300 transition hover:border-red-500 hover:text-red-200 disabled:opacity-50"
+                  >
+                    Lizenz entziehen
+                  </button>
+                </>
+              ) : (
+                <>
+                  <select
+                    value={grantType}
+                    onChange={(e) => setGrantType(e.target.value as "lifetime" | "yearly")}
+                    disabled={isPending}
+                    className="rounded-md border border-[var(--color-border)] bg-black px-2 py-1 text-xs text-zinc-200 focus:border-[var(--color-brand)] focus:outline-none disabled:opacity-50"
+                  >
+                    <option value="lifetime">Lifetime</option>
+                    <option value="yearly">Jahr</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch(
+                        { license: { action: "grant", type: grantType } },
+                        "Zugang vergeben + Mail gesendet.",
+                      )
+                    }
+                    disabled={isPending}
+                    className="rounded-md border border-[var(--color-brand)] bg-[var(--color-brand)]/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[var(--color-brand)] transition hover:bg-[var(--color-brand)]/20 disabled:opacity-50"
+                  >
+                    Zugang geben
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
       </td>
