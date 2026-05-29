@@ -202,4 +202,58 @@ Torsten
 
 ---
 
+# TEIL 3 — FUNNEL-ERGÄNZUNGEN (2 Mails)
+
+## Mail 9 — Cart-Abandon (war auf /angebot, hat nicht gekauft)
+**Trigger:** Besuch auf {{angebot_link}} ohne Kauf
+**Versand:** ~3–6 Stunden danach
+**Betreff:** Du warst kurz davor — was hält dich noch?
+**Preheader:** Eine ehrliche Frage, kein Verkaufsdruck.
+
+Hey {{vorname}},
+
+du hast dir skriptflip angeschaut, aber den letzten Schritt nicht gemacht. Völlig okay — ich will dich nicht überreden.
+
+Aber lass mich kurz raten, was dich bremst. Meistens ist es einer von drei Punkten:
+
+- **„Schaffe ich das technisch?"** — Du fügst einmal deine zwei API-Keys ein, fertig. Dauert fünf Minuten, ich führe dich Schritt für Schritt durch.
+- **„Noch ein Tool, das ich nicht nutze."** — skriptflip ist kein Lern-Tool, das du wegklickst. Du gibst eine Nische ein und hast Minuten später drei sprechfertige Skripte. Es zwingt dich quasi ins Handeln.
+- **„Lohnt sich der Preis?"** — Du zahlst einmal. Keine laufenden Kosten an mich, weil du deine eigenen Keys nutzt. Ein einziges Video, das verkauft, hat den Earlybird-Preis drin.
+
+Wenn dich noch was anderes zurückhält — antworte einfach auf diese Mail. Liest kein Bot, das liest Torsten.
+
+Und falls du startklar bist:
+**{{angebot_link}}**
+
+Torsten
+
+---
+
+## Mail 10 — Post-Sale Onboarding (direkt nach Kauf)
+**Trigger:** erfolgreicher Kauf
+**Versand:** sofort nach Bestellung
+**Betreff:** Willkommen — so legst du in skriptflip los
+**Preheader:** Drei Schritte bis zu deinem ersten Skript.
+
+Hey {{vorname}},
+
+starke Entscheidung. skriptflip gehört jetzt dir.
+
+Damit du nicht erst lange suchst — hier ist dein Start in drei Schritten:
+
+**1. Einloggen.** Geh auf skriptflip.com und melde dich mit deiner E-Mail an.
+
+**2. API-Keys eintragen.** Im Dashboard unter **Einstellungen** fügst du zwei Keys ein: deinen **OpenAI**-Key (für Transkription und Voiceover) und deinen **Claude**-Key (für die Skripte). Wo du die herbekommst, steht direkt daneben verlinkt. Das ist der Schritt, der dich am Anfang fünf Minuten kostet — danach läuft alles.
+
+**3. Erster Scan.** Gib deine Nische ein und lass skriptflip laufen. Du bekommst die verkaufsstärksten Muster und daraus drei eigene Skripte. Nimm eins, sprich es ein oder lass es als Voiceover erzeugen — und bring es raus.
+
+Ein ehrlicher Rat zum Schluss: Warte nicht auf den perfekten Moment. Mach heute deinen ersten Scan und veröffentliche diese Woche dein erstes Skript. Der erste Schritt verändert mehr als jedes weitere Tutorial.
+
+Wenn irgendwo etwas hakt — antworte auf diese Mail. Ich helfe dir rein.
+
+Viel Erfolg,
+Torsten
+
+---
+
 © skriptflip
