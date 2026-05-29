@@ -7,7 +7,11 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  // Einladung/Recovery → Passwort-Seite, sonst Dashboard (oder ?next=).
+  const next =
+    type === "invite" || type === "recovery"
+      ? "/auth/set-password"
+      : (searchParams.get("next") ?? "/dashboard");
 
   console.log("[auth/confirm] incoming params:", {
     token_hash: token_hash ? `${token_hash.slice(0, 12)}...` : null,

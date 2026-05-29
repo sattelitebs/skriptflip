@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendAccessEmail } from "@/lib/auth/provision";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,26 +40,102 @@ export async function PATCH(
     );
   }
 
-  let body: { blocked?: boolean; role?: string };
+  let body: {
+    blocked?: boolean;
+    role?: string;
+    license?: { action: "grant" | "revoke"; type?: "lifetime" | "yearly" };
+    resendEmail?: boolean;
+  };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Ungültiger Body" }, { status: 400 });
   }
 
+  const admin = createAdminClient();
+  let didSomething = false;
+
+  // 1. Profil-Felder (blocked / role)
   const update: { blocked?: boolean; role?: "user" | "admin" } = {};
   if (typeof body.blocked === "boolean") update.blocked = body.blocked;
   if (body.role === "user" || body.role === "admin") update.role = body.role;
+  if (Object.keys(update).length > 0) {
+    const { error } = await admin.from("profiles").update(update).eq("id", targetId);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    didSomething = true;
+  }
 
-  if (Object.keys(update).length === 0) {
+  // 2. Lizenz vergeben / entziehen
+  if (body.license) {
+    const { data: targetProfile } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("id", targetId)
+      .maybeSingle();
+    if (!targetProfile) {
+      return NextResponse.json({ error: "User nicht gefunden" }, { status: 404 });
+    }
+    const nowIso = new Date().toISOString();
+
+    if (body.license.action === "grant") {
+      const type = body.license.type === "yearly" ? "yearly" : "lifetime";
+      const validUntil = type === "yearly" ? oneYearFromNow() : null;
+      const { error } = await admin.from("licenses").upsert(
+        {
+          user_id: targetId,
+          email: targetProfile.email,
+          type,
+          status: "active",
+          valid_until: validUntil,
+          digistore_order_id: `manual-${targetId}`,
+          digistore_product_id: null,
+          last_event: "admin_grant",
+          last_event_at: nowIso,
+        },
+        { onConflict: "user_id" },
+      );
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      // Zugangs-Mail (Account anlegen falls nötig / Login-Link)
+      await sendAccessEmail(targetProfile.email).catch((e) =>
+        console.error("[admin] access mail failed:", e),
+      );
+      didSomething = true;
+    } else if (body.license.action === "revoke") {
+      const { error } = await admin
+        .from("licenses")
+        .update({ status: "cancelled", last_event: "admin_revoke", last_event_at: nowIso })
+        .eq("user_id", targetId);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      didSomething = true;
+    }
+  }
+
+  // 3. Zugangs-Mail erneut senden
+  if (body.resendEmail) {
+    const { data: targetProfile } = await admin
+      .from("profiles")
+      .select("email")
+      .eq("id", targetId)
+      .maybeSingle();
+    if (!targetProfile) {
+      return NextResponse.json({ error: "User nicht gefunden" }, { status: 404 });
+    }
+    const ok = await sendAccessEmail(targetProfile.email);
+    if (!ok) {
+      return NextResponse.json({ error: "Mail konnte nicht gesendet werden" }, { status: 500 });
+    }
+    didSomething = true;
+  }
+
+  if (!didSomething) {
     return NextResponse.json({ error: "Nichts zu aktualisieren" }, { status: 400 });
   }
 
-  // Service-Role bypasst RLS-Trigger nicht — der Trigger erlaubt Admin-Updates,
-  // aber wir nutzen Admin-Client für saubere Audit-Trennung.
-  const admin = createAdminClient();
-  const { error } = await admin.from("profiles").update(update).eq("id", targetId);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
   return NextResponse.json({ ok: true });
+}
+
+function oneYearFromNow(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString();
 }

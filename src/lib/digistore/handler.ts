@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { licenseTypeFor, type LicenseType } from "@/lib/digistore/products";
+import { provisionAccessAndSendEmail, sendAccessEmail } from "@/lib/auth/provision";
 
 export type DigistoreEvent =
   | "Connection-Test"
@@ -80,19 +81,51 @@ export async function handleDigistoreEvent(
         last_event_at: now,
       };
 
+      // Idempotenz: Digistore retried denselben Call, bis er 200 bekommt. Ist die
+      // Order schon als aktive Lizenz verbucht, nicht erneut Account anlegen/mailen.
+      const { data: existingLic } = await admin
+        .from("licenses")
+        .select("status")
+        .eq("digistore_order_id", orderId)
+        .maybeSingle();
+      const alreadyActive = existingLic?.status === "active";
+
       if (profile) {
         await upsertLicense(admin, { ...base, user_id: profile.id });
+        // Zugangs-Mail nur beim Erstkauf, nicht bei Retry/Verlängerung.
+        if (event === "on_payment" && !alreadyActive) {
+          await sendAccessEmail(buyerEmail).catch((e) =>
+            console.error("[digistore] access mail failed:", e),
+          );
+        }
         return {
           processed: true,
           message: event === "on_rebill" ? "Jahresabo verlängert." : `Lizenz (${type}) aktiviert.`,
         };
       }
 
-      // Noch kein Account → Entitlement parken, wird beim ersten Login übernommen.
+      // Kein Account: Beim Erstkauf Account anlegen + Passwort-Mail schicken.
+      if (event === "on_payment" && !alreadyActive) {
+        try {
+          const res = await provisionAccessAndSendEmail(buyerEmail);
+          if (res.userId) {
+            await upsertLicense(admin, { ...base, user_id: res.userId });
+            return {
+              processed: true,
+              message: `Account angelegt + Lizenz (${type}) aktiviert, Zugangs-Mail an ${buyerEmail} gesendet.`,
+            };
+          }
+        } catch (e) {
+          console.error("[digistore] provisioning failed:", e);
+        }
+      }
+
+      // Fallback (Provisionierung gescheitert, Retry oder rebill ohne Account):
+      // Entitlement parken, wird beim ersten Login übernommen (claimPendingLicense).
       await upsertPending(admin, base);
       return {
         processed: true,
-        message: `Kauf (${type}) geparkt — wird bei Registrierung von ${buyerEmail} übernommen.`,
+        message: `Kauf (${type}) geparkt — wird bei Login von ${buyerEmail} übernommen.`,
       };
     }
 
