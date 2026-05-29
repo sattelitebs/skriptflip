@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isValidSlot } from "@/lib/webinar";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -7,7 +8,7 @@ export const dynamic = "force-dynamic";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
-  let body: { email?: string; name?: string };
+  let body: { email?: string; name?: string; slot?: string };
   try {
     body = await request.json();
   } catch {
@@ -20,11 +21,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bitte gib eine gültige E-Mail-Adresse ein." }, { status: 400 });
   }
 
+  const slot = body.slot?.trim();
+  if (!isValidSlot(slot)) {
+    return NextResponse.json({ error: "Bitte wähle einen gültigen Termin aus." }, { status: 400 });
+  }
+
   const admin = createAdminClient();
-  // Upsert auf lower(email) — doppelte Anmeldungen sind kein Fehler.
+  // Upsert auf lower(email): meldet sich jemand erneut für einen anderen Termin an,
+  // gewinnt der neueste Termin (kein ignoreDuplicates).
   const { error } = await admin
     .from("webinar_signups")
-    .upsert({ email, name, source: "webinar-optin" }, { onConflict: "email", ignoreDuplicates: true });
+    .upsert({ email, name, slot, source: "webinar-optin" }, { onConflict: "email" });
 
   if (error && !/duplicate key|conflict/i.test(error.message)) {
     return NextResponse.json({ error: error.message }, { status: 500 });

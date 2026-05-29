@@ -1,389 +1,192 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import WebinarSignupForm from "@/components/WebinarSignupForm";
+import { WEBINAR_SLOTS } from "@/lib/webinar";
+
+export const metadata: Metadata = {
+  title: "Kostenloses Live-Webinar – viraler Content, der verkauft | skriptflip",
+  description:
+    "Wie du in einer Stunde viralen Content erstellst, der wirklich verkauft. Kostenloses Live-Webinar – das System aus 3 Hebeln plus Tool-Reveal am Ende. Such dir deinen Termin aus.",
+};
+
+// Persona hinter dem Webinar – Name hier anpassen.
+const FOUNDER = "Torsten";
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <SocialProof />
-      <Features />
-      <HowItWorks />
-      <Pricing />
-      <FAQ />
-      <FinalCTA />
+      {/* Hero / Opt-in */}
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(254,220,49,0.18),transparent_60%)]"
+        />
+        <div className="mx-auto max-w-3xl px-6 pt-20 pb-16 text-center sm:pt-28">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[var(--color-brand)]">
+            <span className="h-2 w-2 rounded-full bg-[var(--color-brand)]" />
+            Kostenloses Live-Webinar · mehrere Termine
+          </div>
+
+          <h1 className="text-balance text-4xl font-black uppercase leading-[1.05] tracking-tight sm:text-5xl">
+            Wie du in einer Stunde viralen Content erstellst,
+            <br />
+            <span className="bg-[var(--color-brand)] px-3 text-black">der wirklich verkauft.</span>
+          </h1>
+
+          <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg text-zinc-300">
+            Ohne Bauchgefühl-Posten, ohne stundenlanges Hin- und Herschreiben — und ohne hinter
+            Trends herzulaufen, von denen am Ende kein einziger Kunde bei dir kauft.
+          </p>
+
+          <a
+            href="#anmelden"
+            className="mt-10 inline-block rounded-full bg-[var(--color-brand)] px-10 py-4 text-base font-bold text-black transition hover:bg-[var(--color-brand-hover)]"
+          >
+            Jetzt kostenlos Platz sichern →
+          </a>
+        </div>
+      </section>
+
+      {/* Quote-Band */}
+      <section className="border-y border-[var(--color-border)] bg-[var(--color-card)] py-16">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <p className="text-balance text-2xl font-bold leading-snug sm:text-3xl">
+            „Der Unterschied zwischen Content, der viral geht, und Content, der{" "}
+            <span className="text-[var(--color-brand)]">verkauft</span>, ist kein Zufall — es ist
+            ein System."
+          </p>
+          <p className="mt-6 text-sm uppercase tracking-widest text-zinc-500">— {FOUNDER}</p>
+        </div>
+      </section>
+
+      {/* Was du im Webinar lernst — die 3 Hebel */}
+      <section className="py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="text-center text-sm font-bold uppercase tracking-widest text-zinc-500">
+            Was du im Webinar lernst
+          </p>
+          <h2 className="mt-4 text-center text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Die drei Hebel hinter <span className="text-[var(--color-brand)]">viralem Content, der verkauft</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-zinc-400">
+            Ich zeige dir das System, mit dem ich Content erstelle, der nicht nur Reichweite
+            bringt, sondern auch Käufer — und am Ende stelle ich dir das Tool vor, das ich mir
+            genau dafür gebaut habe.
+          </p>
+
+          <div className="mt-14 grid gap-6 md:grid-cols-3">
+            <Lever
+              n="1"
+              title="Radar"
+              desc="Wie du erkennst, welche Themen in deiner Nische gerade wirklich ziehen — und welche nur laut sind, aber keinen Umsatz machen."
+            />
+            <Lever
+              n="2"
+              title="Hook"
+              desc="Die Hook-Struktur, die in den ersten drei Sekunden entscheidet, ob jemand weiterscrollt oder bei dir hängen bleibt — und später bei dir kauft."
+            />
+            <Lever
+              n="3"
+              title="Verkauf"
+              desc="Wie du im Content selbst schon verkaufst, ohne dass es sich nach Werbung anfühlt — und warum genau das den Unterschied zwischen viral und verkauft macht."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Was dich erwartet — Stats */}
+      <section className="border-y border-[var(--color-border)] bg-[var(--color-card)] py-20">
+        <div className="mx-auto max-w-4xl px-6">
+          <p className="text-center text-sm font-bold uppercase tracking-widest text-zinc-500">
+            Was dich erwartet
+          </p>
+          <h2 className="mx-auto mt-4 max-w-3xl text-center text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Kein Theorie-Vortrag. Ich zeige dir mein{" "}
+            <span className="text-[var(--color-brand)]">Content-System</span> — und das Tool dahinter.
+          </h2>
+
+          <div className="mt-14 grid gap-8 sm:grid-cols-3">
+            <Stat n="3" label="Hebel, die viralen Content erst verkaufsstark machen" />
+            <Stat n="60" label="Minuten, in denen du dein Content-Marketing neu denkst" />
+            <Stat n="1" label="Tool-Reveal: das System, das ich mir selbst dafür gebaut habe" />
+          </div>
+        </div>
+      </section>
+
+      {/* Wer dich begleitet */}
+      <section className="py-20">
+        <div className="mx-auto grid max-w-4xl gap-10 px-6 md:grid-cols-2 md:items-center">
+          <div className="aspect-[4/5] rounded-2xl border border-[var(--color-border)] bg-[radial-gradient(ellipse_at_center,rgba(254,220,49,0.12),var(--color-card))]" />
+          <div>
+            <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">
+              Wer dich begleitet
+            </p>
+            <h2 className="mt-3 text-3xl font-black uppercase tracking-tight sm:text-4xl">
+              Hey, ich bin <span className="text-[var(--color-brand)]">{FOUNDER}</span>.
+            </h2>
+            <div className="mt-5 space-y-4 text-zinc-300">
+              <p>
+                Ich helfe Creatorn, Coaches und Selbstständigen, mit Kurzvideos ein Business
+                aufzubauen, das mit ihnen wächst — und Content ist dabei der eine Hebel, der alles
+                andere erst möglich macht.
+              </p>
+              <p>
+                Über die Jahre habe ich gemerkt: Das, was wirklich verkauft, ist kein Glück, sondern
+                ein <strong className="text-white">wiederholbares System</strong>.{" "}
+                <strong className="text-white">skriptflip ist die Maschine, die ich mir dafür gebaut habe.</strong>
+              </p>
+              <p>
+                Im Webinar zeige ich dir das ganze System live — damit du nicht mehr raten musst,
+                was funktioniert, sondern weißt, warum.
+              </p>
+            </div>
+            <a
+              href="#anmelden"
+              className="mt-8 inline-block rounded-full bg-[var(--color-brand)] px-8 py-3 text-sm font-bold uppercase tracking-wide text-black transition hover:bg-[var(--color-brand-hover)]"
+            >
+              Ich bin dabei →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Anmeldung mit Termin-Auswahl */}
+      <section id="anmelden" className="border-t border-[var(--color-border)] bg-[var(--color-card)] py-20">
+        <div className="mx-auto max-w-2xl px-6 text-center">
+          <h2 className="text-balance text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Such dir deinen <span className="text-[var(--color-brand)]">Termin</span> aus
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+            Eine Stunde, die deinen Blick auf Content komplett verändert. Kostenfrei, live, mit dem
+            kompletten Tool-Reveal am Ende. {WEBINAR_SLOTS.length} Termine zur Auswahl — nimm den,
+            der dir passt.
+          </p>
+
+          <div className="mx-auto mt-8 max-w-md text-left">
+            <WebinarSignupForm />
+          </div>
+        </div>
+      </section>
     </>
   );
 }
 
-function Hero() {
+function Lever({ n, title, desc }: { n: string; title: string; desc: string }) {
   return (
-    <section className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,rgba(254,220,49,0.18),transparent_60%)]"
-      />
-      <div className="mx-auto max-w-5xl px-6 pt-24 pb-20 text-center sm:pt-32">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-1.5 text-xs font-medium text-zinc-300">
-          <span className="h-2 w-2 rounded-full bg-[var(--color-brand)]" />
-          Neu: KI-Skript-Analyse für TikTok, Instagram & YouTube
-        </div>
-
-        <h1 className="text-balance text-4xl font-black uppercase leading-[1.0] tracking-tight sm:text-6xl">
-          Lerne von viralen Videos.
-          <br />
-          <span className="bg-[var(--color-brand)] px-3 text-black">Schreib dein eigenes.</span>
-        </h1>
-
-        <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg text-zinc-300 sm:text-xl">
-          Füge einen TikTok-, Instagram- oder YouTube-Link ein. Die KI zerlegt das
-          virale Skript in seine Bausteine und liefert dir <strong className="text-white">3 eigene Versionen</strong> –
-          mit Hook, Hashtags und Captions. In 60 Sekunden.
-        </p>
-
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link
-            href="/register"
-            className="w-full rounded-full bg-[var(--color-brand)] px-8 py-4 text-base font-bold text-black transition hover:bg-[var(--color-brand-hover)] sm:w-auto"
-          >
-            3 Analysen kostenlos starten →
-          </Link>
-          <a
-            href="#so-gehts"
-            className="w-full rounded-full border border-[var(--color-border)] px-8 py-4 text-base font-semibold text-white transition hover:bg-white/5 sm:w-auto"
-          >
-            So funktioniert&apos;s
-          </a>
-        </div>
-
-        <p className="mt-5 text-sm text-zinc-500">
-          Keine Kreditkarte. In 30 Sekunden registriert.
-        </p>
-
-        {/* Demo-Mockup */}
-        <div className="mt-16 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-2 shadow-2xl shadow-[var(--color-brand)]/10">
-          <div className="rounded-xl bg-black p-6 sm:p-10">
-            <div className="mb-4 flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-zinc-700" />
-              <span className="h-3 w-3 rounded-full bg-zinc-700" />
-              <span className="h-3 w-3 rounded-full bg-zinc-700" />
-              <span className="ml-3 text-xs text-zinc-500">skriptflip · Dashboard</span>
-            </div>
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-4 text-left sm:p-6">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                Virales Video einfügen
-              </label>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                <div className="flex-1 rounded-md border border-[var(--color-border)] bg-black px-4 py-3 text-sm text-zinc-400">
-                  https://www.tiktok.com/@user/video/...
-                </div>
-                <button className="rounded-md bg-[var(--color-brand)] px-5 py-3 text-sm font-bold text-black">
-                  Analysieren
-                </button>
-              </div>
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <Card title="Transkript" />
-                <Card title="Hook-Analyse" />
-                <Card title="3 neue Skripte" />
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8 text-center">
+      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[var(--color-brand)] text-lg font-black text-black">
+        {n}
       </div>
-    </section>
-  );
-}
-
-function Card({ title }: { title: string }) {
-  return (
-    <div className="rounded-md border border-[var(--color-border)] bg-black p-4 text-left">
-      <div className="mb-2 h-2 w-12 rounded bg-[var(--color-brand)]" />
-      <p className="text-sm font-semibold text-white">{title}</p>
-      <div className="mt-3 space-y-1.5">
-        <div className="h-2 w-full rounded bg-zinc-800" />
-        <div className="h-2 w-5/6 rounded bg-zinc-800" />
-        <div className="h-2 w-3/4 rounded bg-zinc-800" />
-      </div>
+      <h3 className="mt-5 text-2xl font-black uppercase tracking-tight">{title}</h3>
+      <p className="mt-3 text-sm text-zinc-400">{desc}</p>
     </div>
   );
 }
 
-function SocialProof() {
+function Stat({ n, label }: { n: string; label: string }) {
   return (
-    <section className="border-y border-[var(--color-border)] bg-[var(--color-card)] py-10">
-      <div className="mx-auto max-w-6xl px-6">
-        <p className="mb-6 text-center text-sm uppercase tracking-wider text-zinc-500">
-          Funktioniert mit den größten Plattformen
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-zinc-400">
-          <span className="text-2xl font-black">TikTok</span>
-          <span className="text-2xl font-black">Instagram</span>
-          <span className="text-2xl font-black">YouTube</span>
-        </div>
-      </div>
-    </section>
+    <div className="text-center">
+      <div className="text-6xl font-black text-[var(--color-brand)]">{n}</div>
+      <p className="mx-auto mt-2 max-w-[12rem] text-sm text-zinc-400">{label}</p>
+    </div>
   );
 }
-
-function Features() {
-  const items = [
-    {
-      title: "Sofort-Transkription",
-      desc: "URL einfügen, Text fertig. TikTok, Reels, Shorts – alles in Sekunden.",
-    },
-    {
-      title: "Hook-Analyse",
-      desc: "Was macht die ersten 3 Sekunden süchtig? Die KI zerlegt jeden Trigger.",
-    },
-    {
-      title: "3 Skript-Varianten",
-      desc: "Analytisch, aspirational, anthropologisch. Drei Winkel, drei eigene Skripte.",
-    },
-    {
-      title: "Captions & Hashtags",
-      desc: "Plattformspezifisch. Inklusive Musik-Empfehlung. Direkt copy-paste-fertig.",
-    },
-    {
-      title: "Bulk-Modus",
-      desc: "Bis zu 20 Links auf einmal. Für deine ganze Content-Pipeline auf einen Schlag.",
-    },
-    {
-      title: "Excel- & PDF-Export",
-      desc: "Alles strukturiert exportieren. Für dich, dein Team, deine VAs.",
-    },
-  ];
-  return (
-    <section id="features" className="py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-4xl font-black uppercase leading-tight sm:text-5xl">
-            Alles, was du brauchst, um <span className="text-[var(--color-brand)]">viral zu gehen</span>.
-          </h2>
-          <p className="mt-4 text-lg text-zinc-400">
-            Keine Tool-Sammelsurium. Kein Tab-Chaos. Ein Workflow – von Link bis fertigem Skript.
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((it) => (
-            <div
-              key={it.title}
-              className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-6 transition hover:border-[var(--color-brand)]/40"
-            >
-              <div className="mb-4 grid h-10 w-10 place-items-center rounded-lg bg-[var(--color-brand)] text-lg font-black text-black">
-                ✓
-              </div>
-              <h3 className="text-lg font-bold">{it.title}</h3>
-              <p className="mt-2 text-sm text-zinc-400">{it.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    {
-      n: "01",
-      title: "Link einfügen",
-      desc: "Kopiere die URL eines viralen Videos – TikTok, Reel, Short. Klick auf Analysieren.",
-    },
-    {
-      n: "02",
-      title: "KI macht den Rest",
-      desc: "Transkription, Hook-Analyse, Trigger, Retention-Bogen. Alles in unter 60 Sekunden.",
-    },
-    {
-      n: "03",
-      title: "Dein Skript",
-      desc: "Du bekommst 3 eigene Skripte mit Caption + Hashtags. Aufnehmen, posten, viral gehen.",
-    },
-  ];
-  return (
-    <section id="so-gehts" className="border-y border-[var(--color-border)] bg-[var(--color-card)] py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-4xl font-black uppercase leading-tight sm:text-5xl">
-            In <span className="text-[var(--color-brand)]">3 Schritten</span> zum viralen Skript.
-          </h2>
-          <p className="mt-4 text-lg text-zinc-400">
-            Hör auf, vor dem leeren Editor zu sitzen. Lass die KI die Arbeit machen.
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          {steps.map((s) => (
-            <div key={s.n} className="relative">
-              <div className="text-7xl font-black text-[var(--color-brand)]/20">{s.n}</div>
-              <h3 className="mt-2 text-2xl font-bold">{s.title}</h3>
-              <p className="mt-3 text-zinc-400">{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Pricing() {
-  return (
-    <section id="preise" className="py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-balance text-4xl font-black uppercase leading-tight sm:text-5xl">
-            Ein fairer Preis. <span className="text-[var(--color-brand)]">Keine Tricks.</span>
-          </h2>
-          <p className="mt-4 text-lg text-zinc-400">
-            Erst testen. Dann zahlen. Jederzeit kündigen.
-          </p>
-        </div>
-
-        <div className="mx-auto mt-16 grid max-w-3xl gap-6 md:grid-cols-2">
-          {/* Free */}
-          <div className="flex flex-col rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-8">
-            <div>
-              <h3 className="text-lg font-bold uppercase tracking-wider text-zinc-400">Test</h3>
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-5xl font-black">0 €</span>
-                <span className="text-zinc-500">für immer</span>
-              </div>
-              <p className="mt-2 text-sm text-zinc-400">Zum Reinschnuppern. Keine Kreditkarte.</p>
-            </div>
-            <ul className="mt-6 flex-1 space-y-3 text-sm">
-              <Bullet>3 Skript-Analysen gesamt</Bullet>
-              <Bullet>Alle Plattformen</Bullet>
-              <Bullet>Hook-Analyse + 3 Varianten</Bullet>
-              <Bullet>Captions + Hashtags</Bullet>
-            </ul>
-            <Link
-              href="/register"
-              className="mt-8 rounded-full border border-[var(--color-border)] px-6 py-3 text-center font-semibold transition hover:bg-white/5"
-            >
-              Kostenlos starten
-            </Link>
-          </div>
-
-          {/* Creator */}
-          <div className="relative flex flex-col rounded-2xl border-2 border-[var(--color-brand)] bg-[var(--color-card)] p-8 shadow-2xl shadow-[var(--color-brand)]/10">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[var(--color-brand)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-black">
-              Empfohlen
-            </div>
-            <div>
-              <h3 className="text-lg font-bold uppercase tracking-wider text-[var(--color-brand)]">Creator</h3>
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-5xl font-black">9 €</span>
-                <span className="text-zinc-500">/ Monat</span>
-              </div>
-              <p className="mt-2 text-sm text-zinc-400">
-                Für alle, die regelmäßig Content posten.
-              </p>
-            </div>
-            <ul className="mt-6 flex-1 space-y-3 text-sm">
-              <Bullet>25 Skript-Analysen / Monat</Bullet>
-              <Bullet>Alles aus „Test"</Bullet>
-              <Bullet>Bulk-Modus (20 Links auf einmal)</Bullet>
-              <Bullet>Excel- & PDF-Export</Bullet>
-              <Bullet>Priority-Verarbeitung</Bullet>
-              <Bullet>Jederzeit kündbar</Bullet>
-            </ul>
-            <Link
-              href="/register?plan=creator"
-              className="mt-8 rounded-full bg-[var(--color-brand)] px-6 py-3 text-center font-bold text-black transition hover:bg-[var(--color-brand-hover)]"
-            >
-              Creator-Plan starten
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Bullet({ children }: { children: React.ReactNode }) {
-  return (
-    <li className="flex items-start gap-3">
-      <span className="mt-0.5 grid h-5 w-5 flex-shrink-0 place-items-center rounded-full bg-[var(--color-brand)] text-xs font-black text-black">
-        ✓
-      </span>
-      <span className="text-zinc-200">{children}</span>
-    </li>
-  );
-}
-
-function FAQ() {
-  const faqs = [
-    {
-      q: "Ist das rechtlich sauber? Ist das nicht Plagiat?",
-      a: "Nein. Die KI extrahiert nur das Skript-Gerüst (Hook-Formel, Trigger, Retention-Bogen) – also die Struktur, die viele virale Videos gemeinsam haben. Daraus baut sie dir drei komplett eigene Versionen mit deinen Themen, deiner Sprache, für deine Nische. Was du bekommst, ist 100 % originaler Content – nur mit einer bewährten Struktur darunter. Strukturen sind nicht urheberrechtlich geschützt, Wortlaute schon. Genau deshalb generieren wir neuen Wortlaut.",
-    },
-    {
-      q: "Welche Plattformen werden unterstützt?",
-      a: "TikTok, Instagram (Reels), YouTube (Shorts und normale Videos). Facebook ist in Planung.",
-    },
-    {
-      q: "Wie lange dauert eine Analyse?",
-      a: "In der Regel 30–90 Sekunden pro Video. Im Bulk-Modus parallel.",
-    },
-    {
-      q: "Kann ich jederzeit kündigen?",
-      a: "Ja. Ein Klick im Account. Keine Mindestlaufzeit, keine versteckten Klauseln.",
-    },
-    {
-      q: "Was passiert mit meinen Daten?",
-      a: "Deine analysierten Links und generierten Skripte sind nur für dich sichtbar. Wir trainieren keine Modelle damit.",
-    },
-    {
-      q: "Funktioniert das auch für Long-Form-YouTube?",
-      a: "Ja, auch längere Videos werden vollständig transkribiert und analysiert. Bei sehr langen Videos dauert es entsprechend länger.",
-    },
-  ];
-  return (
-    <section id="faq" className="border-y border-[var(--color-border)] bg-[var(--color-card)] py-24">
-      <div className="mx-auto max-w-3xl px-6">
-        <h2 className="text-balance text-center text-4xl font-black uppercase leading-tight sm:text-5xl">
-          Häufige <span className="text-[var(--color-brand)]">Fragen</span>
-        </h2>
-        <div className="mt-12 space-y-4">
-          {faqs.map((f) => (
-            <details
-              key={f.q}
-              className="group rounded-xl border border-[var(--color-border)] bg-black p-6 [&_summary::-webkit-details-marker]:hidden"
-            >
-              <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold">
-                {f.q}
-                <span className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-full border border-[var(--color-border)] text-sm transition group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-4 text-zinc-400">{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FinalCTA() {
-  return (
-    <section className="py-24">
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <h2 className="text-balance text-4xl font-black uppercase leading-tight sm:text-6xl">
-          Hör auf zu raten.
-          <br />
-          <span className="bg-[var(--color-brand)] px-3 text-black">Fang an zu flippen.</span>
-        </h2>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-zinc-300">
-          3 Analysen kostenlos. Keine Kreditkarte. Ergebnis in 60 Sekunden.
-        </p>
-        <Link
-          href="/register"
-          className="mt-10 inline-block rounded-full bg-[var(--color-brand)] px-10 py-4 text-lg font-bold text-black transition hover:bg-[var(--color-brand-hover)]"
-        >
-          Jetzt kostenlos starten →
-        </Link>
-      </div>
-    </section>
-  );
-}
-

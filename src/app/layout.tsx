@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "skriptflip – Lerne von viralen Videos. Schreib dein eigenes.",
+  title: "skriptflip – viraler Content, der verkauft",
   description:
-    "Füge einen TikTok-, Instagram- oder YouTube-Link ein. Die KI zerlegt das virale Skript in seine Bausteine und liefert dir 3 eigene Versionen – mit Hook, Hashtags und Captions. In 60 Sekunden.",
+    "Der Sales-Radar für Kurzvideos: Finde in jeder Nische die Themen, die nicht nur ziehen, sondern verkaufen – inklusive Hook und sprechfertigen Skripten. Lerne das System im kostenlosen Live-Webinar.",
 };
 
 export default function RootLayout({

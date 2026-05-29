@@ -59,7 +59,7 @@ export default async function ViralResearchPage() {
                 : "Trag zuerst deine OpenAI- und Anthropic-API-Keys in den Einstellungen ein."}
           </p>
           <Link
-            href={access.license.isActive ? "/dashboard/settings" : "https://skriptflip.com#preise"}
+            href={access.license.isActive ? "/dashboard/settings" : "/angebot"}
             className="inline-block rounded-md bg-[var(--color-brand)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-black transition hover:brightness-95"
           >
             {access.license.isActive ? "Zu den Einstellungen →" : "Lizenz sichern →"}

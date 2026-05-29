@@ -85,7 +85,7 @@ export default async function DashboardPage() {
             {licenseBannerBody(access.license.status)}
           </p>
           <a
-            href="https://skriptflip.com#preise"
+            href="/angebot"
             className="inline-block rounded-md bg-[var(--color-brand)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-black transition hover:brightness-95"
           >
             Lifetime sichern →

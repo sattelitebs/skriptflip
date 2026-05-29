@@ -161,7 +161,7 @@ export default function AngebotPage() {
               Zugang sichern →
             </a>
             <Link
-              href="/webinar"
+              href="/"
               className="rounded-full border border-[var(--color-border)] px-8 py-4 text-base font-semibold text-white transition hover:bg-white/5"
             >
               Erst ins Webinar
