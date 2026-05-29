@@ -7,11 +7,14 @@ export const metadata: Metadata = {
     "Das System aus dem Webinar als Tool: Sales-Radar findet in jeder Nische die Themen, die verkaufen, schreibt dir die Hook und liefert sprechfertige Skripte. Lifetime oder Jahresabo.",
 };
 
-// Digistore-Links später eintragen (Phase B Webhook ist bereits verdrahtet).
+// Digistore24-Produkt 646049. Aktuell EIN Produkt für alle Stufen — auf der
+// Digistore-Bestellseite wählt der Käufer den Zahlungsplan. Falls regulär (297)
+// und Jahresabo (97) eigene Digistore-Produkte sind, hier separate Links setzen.
+const DIGISTORE_PRODUCT = "https://www.digistore24.com/product/646049";
 const DIGISTORE = {
-  lifetimeEarlybird: "#",
-  lifetimeRegular: "#",
-  yearly: "#",
+  lifetimeEarlybird: DIGISTORE_PRODUCT,
+  lifetimeRegular: DIGISTORE_PRODUCT,
+  yearly: DIGISTORE_PRODUCT,
 };
 
 export default function AngebotPage() {
