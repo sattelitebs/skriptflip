@@ -51,6 +51,12 @@ export default async function DashboardPage() {
             Einstellungen
           </Link>
           <Link
+            href="/dashboard/viral-research"
+            className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-zinc-300 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
+          >
+            Viral-Research →
+          </Link>
+          <Link
             href="/dashboard/hooks"
             className="rounded-md border border-[var(--color-border)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-zinc-300 transition hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
           >
@@ -79,7 +85,7 @@ export default async function DashboardPage() {
             {licenseBannerBody(access.license.status)}
           </p>
           <a
-            href="https://skriptflip.com#preise"
+            href="/angebot"
             className="inline-block rounded-md bg-[var(--color-brand)] px-4 py-2 text-sm font-bold uppercase tracking-wide text-black transition hover:brightness-95"
           >
             Lifetime sichern →

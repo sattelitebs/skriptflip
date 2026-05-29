@@ -18,13 +18,6 @@ export async function SiteHeader() {
           <span className="text-lg tracking-tight">skriptflip</span>
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm text-zinc-300 md:flex">
-          <Link href="/#features" className="hover:text-white">Features</Link>
-          <Link href="/#so-gehts" className="hover:text-white">So geht&apos;s</Link>
-          <Link href="/#preise" className="hover:text-white">Preise</Link>
-          <Link href="/#faq" className="hover:text-white">FAQ</Link>
-        </nav>
-
         <div className="flex items-center gap-3">
           {user ? (
             <>
@@ -44,20 +37,12 @@ export async function SiteHeader() {
               </form>
             </>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="hidden text-sm text-zinc-300 hover:text-white sm:block"
-              >
-                Anmelden
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-full bg-[var(--color-brand)] px-4 py-2 text-sm font-semibold text-black transition hover:bg-[var(--color-brand-hover)]"
-              >
-                Kostenlos starten
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="rounded-full border border-[var(--color-border)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/5"
+            >
+              Login
+            </Link>
           )}
         </div>
       </div>
