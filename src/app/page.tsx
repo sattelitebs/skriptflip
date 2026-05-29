@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import WebinarSignupModal from "@/components/WebinarSignupModal";
 
 export const metadata: Metadata = {
   title: "Kostenloses Live-Webinar – viraler Content, der verkauft | skriptflip",
@@ -168,7 +168,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Anmeldung via 4leads-Formular */}
+      {/* Anmeldung via 4leads-Popup */}
       <section id="anmelden" className="border-t border-[var(--color-border)] bg-[var(--color-card)] py-20">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <h2 className="text-balance text-3xl font-black uppercase leading-tight sm:text-4xl">
@@ -176,28 +176,16 @@ export default function Home() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Eine Stunde, die deinen Blick auf Content komplett verändert. Kostenfrei, live, mit dem
-            kompletten Tool-Reveal am Ende. Trag dich hier ein — Zugangslink und Erinnerungen
-            bekommst du danach per Mail.
+            kompletten Tool-Reveal am Ende. Klick auf den Button und trag dich im Fenster ein —
+            Zugangslink und Erinnerungen bekommst du danach per Mail.
           </p>
 
-          <div className="mx-auto mt-8 max-w-lg">
-            <div
-              data-height="380"
-              className="fl-form"
-              data-max-height=""
-              data-k="duMG8a"
-              data-p="c_VNAwUhp8k4NGyy9X9VKguKMyppNwwZSwzjntMSMZ"
-              data-d="https://forms.4leads.net"
-            />
-          </div>
+          <WebinarSignupModal />
+
           <p className="mt-4 text-xs text-zinc-500">
             100 % kostenlos. Kein Verkaufsgespräch. Jederzeit abmeldbar.
           </p>
         </div>
-        <Script
-          src="https://static.4leads.net/assets/bundle/flForms.js?v=6.15.6"
-          strategy="afterInteractive"
-        />
       </section>
     </>
   );
