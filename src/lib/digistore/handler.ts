@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { licenseTypeFor, type LicenseType } from "@/lib/digistore/products";
 
 export type DigistoreEvent =
   | "Connection-Test"
@@ -17,16 +18,16 @@ type HandlerOutcome = {
 
 /**
  * Verarbeitet einen verifizierten Digistore-IPN-Call und legt/aktualisiert
- * die Lizenz in `public.licenses` an.
+ * die Lizenz an.
  *
- * Mapping:
- *   - billing_type "single_payment" → license.type = "lifetime"  (valid_until = NULL)
- *   - billing_type "subscription"   → license.type = "yearly"    (valid_until = now + 1 Jahr)
+ * Typ-Zuordnung (src/lib/digistore/products.ts): explizite Produkt-ID-Map gewinnt,
+ * Fallback ist Digistores billing_type (subscription → yearly, sonst lifetime).
+ * yearly bekommt valid_until = now + 1 Jahr, lifetime bleibt unbefristet (NULL).
  *
- * Wenn der Buyer noch keinen skriptflip-Account hat (Email kommt nicht in
- * `profiles` vor), wird das Event geloggt und mit processed=false beantwortet —
- * Digistore bekommt trotzdem 200 zurück (Code im Route-Handler), damit es
- * keine Endlos-Retries gibt.
+ * Hat der Käufer schon einen Account (profiles-Treffer per E-Mail), landet die
+ * Lizenz direkt in `public.licenses`. Andernfalls (Kauf vor Registrierung — der
+ * Funnel-Normalfall) wird sie in `public.pending_licenses` geparkt und beim ersten
+ * eingeloggten Seitenaufruf übernommen (siehe claimPendingLicense in access.ts).
  */
 export async function handleDigistoreEvent(
   params: Record<string, string>,
@@ -57,75 +58,53 @@ export async function handleDigistoreEvent(
     .eq("email", buyerEmail)
     .maybeSingle();
 
-  if (!profile) {
-    return {
-      processed: false,
-      message:
-        "Käufer hat noch keinen skriptflip-Account. Lizenz wird bei Registrierung übernommen.",
-    };
-  }
-
+  // Produkt-ID-Zuordnung gewinnt, Fallback ist Digistores billing_type.
   const billingType = params.order_billing_type ?? params.billing_type ?? "";
-  const isSubscription = billingType === "subscription";
-  const licenseType: "lifetime" | "yearly" = isSubscription ? "yearly" : "lifetime";
+  const licenseType = licenseTypeFor(productId, billingType);
+  const now = new Date().toISOString();
 
   switch (event) {
-    case "on_payment": {
-      const validUntil = isSubscription ? oneYearFromNow() : null;
-      await upsertLicense(admin, {
-        user_id: profile.id,
+    case "on_payment":
+    case "on_rebill": {
+      // on_rebill betrifft nur Abos → immer yearly.
+      const type: LicenseType = event === "on_rebill" ? "yearly" : licenseType;
+      const validUntil = type === "yearly" ? oneYearFromNow() : null;
+      const base = {
         email: buyerEmail,
-        type: licenseType,
-        status: "active",
+        type,
+        status: "active" as const,
         valid_until: validUntil,
         digistore_order_id: orderId,
         digistore_product_id: productId,
         last_event: event,
-        last_event_at: new Date().toISOString(),
-      });
-      return { processed: true, message: `Lizenz (${licenseType}) aktiviert.` };
-    }
+        last_event_at: now,
+      };
 
-    case "on_rebill": {
-      await upsertLicense(admin, {
-        user_id: profile.id,
-        email: buyerEmail,
-        type: "yearly",
-        status: "active",
-        valid_until: oneYearFromNow(),
-        digistore_order_id: orderId,
-        digistore_product_id: productId,
-        last_event: event,
-        last_event_at: new Date().toISOString(),
-      });
-      return { processed: true, message: "Jahresabo verlängert." };
+      if (profile) {
+        await upsertLicense(admin, { ...base, user_id: profile.id });
+        return {
+          processed: true,
+          message: event === "on_rebill" ? "Jahresabo verlängert." : `Lizenz (${type}) aktiviert.`,
+        };
+      }
+
+      // Noch kein Account → Entitlement parken, wird beim ersten Login übernommen.
+      await upsertPending(admin, base);
+      return {
+        processed: true,
+        message: `Kauf (${type}) geparkt — wird bei Registrierung von ${buyerEmail} übernommen.`,
+      };
     }
 
     case "on_refund":
-    case "on_chargeback": {
-      await admin
-        .from("licenses")
-        .update({
-          status: "refunded",
-          last_event: event,
-          last_event_at: new Date().toISOString(),
-        })
-        .eq("digistore_order_id", orderId);
+    case "on_chargeback":
+      await setStatusByOrder(admin, orderId, "refunded", event, now);
       return { processed: true, message: "Lizenz auf 'refunded' gesetzt." };
-    }
 
     case "on_revoke":
-    case "on_payment_missed": {
-      await admin
-        .from("licenses")
-        .update({
-          status: "cancelled",
-          last_event: event,
-          last_event_at: new Date().toISOString(),
-        })
-        .eq("digistore_order_id", orderId);
+    case "on_payment_missed":
+      await setStatusByOrder(admin, orderId, "cancelled", event, now);
       return { processed: true, message: "Lizenz auf 'cancelled' gesetzt." };
-    }
 
     default:
       return { processed: false, message: `Event '${event}' wird nicht behandelt.` };
@@ -154,6 +133,35 @@ async function upsertLicense(
   if (error) {
     throw new Error(`License upsert failed: ${error.message}`);
   }
+}
+
+// Käufe ohne Account: per Bestellung idempotent parken (siehe 010_pending_licenses.sql).
+type PendingRow = Omit<LicenseRow, "user_id">;
+
+async function upsertPending(
+  admin: ReturnType<typeof createAdminClient>,
+  row: PendingRow,
+): Promise<void> {
+  const { error } = await admin
+    .from("pending_licenses")
+    .upsert(row, { onConflict: "digistore_order_id" });
+  if (error) {
+    throw new Error(`Pending-License upsert failed: ${error.message}`);
+  }
+}
+
+// Storno/Refund kann eine Bestellung treffen, die schon übernommen ODER noch
+// geparkt ist — beide Tabellen per order_id aktualisieren.
+async function setStatusByOrder(
+  admin: ReturnType<typeof createAdminClient>,
+  orderId: string,
+  status: "refunded" | "cancelled",
+  event: string,
+  at: string,
+): Promise<void> {
+  const patch = { status, last_event: event, last_event_at: at };
+  await admin.from("licenses").update(patch).eq("digistore_order_id", orderId);
+  await admin.from("pending_licenses").update(patch).eq("digistore_order_id", orderId);
 }
 
 function oneYearFromNow(): string {
