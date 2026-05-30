@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import WebinarSignupForm from "@/components/WebinarSignupForm";
 
 export const metadata: Metadata = {
-  title: "Kostenloses Live-Webinar – viraler Content, der verkauft | skriptflip",
+  title: "Kostenloser Live-Workshop – viraler Content, der verkauft | skriptflip",
   description:
-    "Wie du in einer Stunde viralen Content erstellst, der wirklich verkauft. Kostenloses Live-Webinar – das System aus 3 Hebeln plus Tool-Reveal am Ende. Sichere dir deinen Platz.",
+    "Wie du in einer Stunde viralen Content erstellst, der wirklich verkauft. Kostenloser Live-Workshop – das System aus 3 Hebeln plus Tool-Reveal am Ende. Sichere dir deinen Platz.",
 };
 
-// Persona hinter dem Webinar – Name hier anpassen.
+// Persona hinter dem Workshop – Name hier anpassen.
 const FOUNDER = "Torsten";
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
         <div className="mx-auto max-w-3xl px-6 pt-20 pb-16 text-center sm:pt-28">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[var(--color-brand)]">
             <span className="h-2 w-2 rounded-full bg-[var(--color-brand)]" />
-            Kostenloses Live-Webinar · mehrere Termine
+            Kostenloser Live-Workshop · mehrere Termine
           </div>
 
           <h1 className="text-balance text-4xl font-black uppercase leading-[1.05] tracking-tight sm:text-5xl">
@@ -57,11 +57,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Was du im Webinar lernst — die 3 Hebel */}
+      {/* Was wir im Workshop machen — die 3 Hebel */}
       <section className="py-20">
         <div className="mx-auto max-w-5xl px-6">
           <p className="text-center text-sm font-bold uppercase tracking-widest text-zinc-500">
-            Was du im Webinar lernst
+            Was wir im Workshop zusammen durchgehen
           </p>
           <h2 className="mt-4 text-center text-3xl font-black uppercase leading-tight sm:text-4xl">
             Die drei Hebel hinter <span className="text-[var(--color-brand)]">viralem Content, der verkauft</span>
@@ -99,13 +99,13 @@ export default function Home() {
             Was dich erwartet
           </p>
           <h2 className="mx-auto mt-4 max-w-3xl text-center text-3xl font-black uppercase leading-tight sm:text-4xl">
-            Kein Theorie-Vortrag. Ich zeige dir mein{" "}
-            <span className="text-[var(--color-brand)]">Content-System</span> — und das Tool dahinter.
+            Kein Theorie-Vortrag. Wir bauen live dein{" "}
+            <span className="text-[var(--color-brand)]">Content-System</span> — mit dem Tool dahinter.
           </h2>
 
           <div className="mt-14 grid gap-8 sm:grid-cols-3">
-            <Stat n="3" label="Hebel, die viralen Content erst verkaufsstark machen" />
-            <Stat n="60" label="Minuten, in denen du dein Content-Marketing neu denkst" />
+            <Stat n="3" label="Hebel, die viralen Content erst verkaufsstark machen — Schritt für Schritt zum Mitmachen" />
+            <Stat n="60" label="Minuten, in denen wir dein Content-Marketing live neu aufsetzen" />
             <Stat n="1" label="Tool-Reveal: das System, das ich mir selbst dafür gebaut habe" />
           </div>
         </div>
@@ -142,8 +142,9 @@ export default function Home() {
                 skriptflip ist die Maschine, die ich mir dafür gebaut habe.
               </p>
               <p>
-                Im Webinar zeige ich dir genau dieses System live — damit du nicht mehr rätst, was
-                funktioniert, sondern weißt, warum. Und damit du endlich ins Handeln kommst.
+                Im Workshop gehen wir genau dieses System live zusammen durch — damit du nicht mehr
+                rätst, was funktioniert, sondern weißt, warum. Und damit du noch im Workshop ins
+                Handeln kommst.
               </p>
             </div>
             <a
@@ -175,16 +176,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Anmeldung via 4leads-Popup */}
+      {/* Anmeldung via 4leads-Formular */}
       <section id="anmelden" className="border-t border-[var(--color-border)] bg-[var(--color-card)] py-20">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <h2 className="text-balance text-3xl font-black uppercase leading-tight sm:text-4xl">
             Sichere dir jetzt deinen <span className="text-[var(--color-brand)]">Platz</span>
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Eine Stunde, die deinen Blick auf Content komplett verändert. Kostenfrei, live, mit dem
-            kompletten Tool-Reveal am Ende. Trag dich hier ein — Zugangslink und Erinnerungen
-            bekommst du danach per Mail.
+            Ein Live-Workshop, in dem wir dein Content-System gemeinsam aufsetzen — kostenfrei, zum
+            Mitmachen, mit dem kompletten Tool-Reveal am Ende. Trag dich hier ein, Zugangslink und
+            Erinnerungen bekommst du danach per Mail.
           </p>
 
           <WebinarSignupForm />
