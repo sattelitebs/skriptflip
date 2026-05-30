@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Du bist dabei – Anmeldung bestätigt | skriptflip",
   description:
-    "Deine Anmeldung zum kostenlosen Live-Webinar ist bestätigt. Zugangslink und Termin bekommst du per Mail.",
+    "Deine Anmeldung zum kostenlosen Live-Workshop ist bestätigt. Zugangslink und Termin bekommst du per Mail.",
   robots: { index: false, follow: false },
 };
 
@@ -25,7 +25,7 @@ export default function Danke() {
         </h1>
 
         <p className="mx-auto mt-8 max-w-xl text-pretty text-lg text-zinc-300">
-          Deinen Platz fürs Webinar habe ich reserviert. Den genauen Termin und deinen persönlichen
+          Deinen Platz im Workshop habe ich reserviert. Den genauen Termin und deinen persönlichen
           Zugangslink bekommst du gleich per Mail — schau am besten direkt rein.
         </p>
 
@@ -49,8 +49,8 @@ export default function Danke() {
         </div>
 
         <p className="mx-auto mt-12 max-w-xl text-pretty text-zinc-400">
-          Wir sehen uns im Webinar. Ich zeige dir das komplette System — Radar, Hook, Verkauf — und
-          am Ende das Tool, das ich mir genau dafür gebaut habe.
+          Wir sehen uns im Workshop. Wir gehen das komplette System zusammen durch — Radar, Hook,
+          Verkauf — und am Ende das Tool, das ich mir genau dafür gebaut habe.
         </p>
         <p className="mt-6 text-sm uppercase tracking-widest text-zinc-500">— Torsten</p>
       </div>
