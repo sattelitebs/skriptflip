@@ -114,7 +114,14 @@ export default function Home() {
       {/* Wer dich begleitet */}
       <section className="py-20">
         <div className="mx-auto grid max-w-4xl gap-10 px-6 md:grid-cols-2 md:items-center">
-          <div className="aspect-[4/5] rounded-2xl border border-[var(--color-border)] bg-[radial-gradient(ellipse_at_center,rgba(254,220,49,0.12),var(--color-card))]" />
+          <div className="aspect-[4/5] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/torsten.jpg"
+              alt="Torsten Jaeger"
+              className="h-full w-full object-cover object-top"
+            />
+          </div>
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-zinc-500">
               Wer dich begleitet
