@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import WebinarSignupModal from "@/components/WebinarSignupModal";
+import WebinarSignupForm from "@/components/WebinarSignupForm";
 
 export const metadata: Metadata = {
   title: "Kostenloses Live-Webinar – viraler Content, der verkauft | skriptflip",
@@ -183,11 +183,11 @@ export default function Home() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
             Eine Stunde, die deinen Blick auf Content komplett verändert. Kostenfrei, live, mit dem
-            kompletten Tool-Reveal am Ende. Klick auf den Button und trag dich im Fenster ein —
-            Zugangslink und Erinnerungen bekommst du danach per Mail.
+            kompletten Tool-Reveal am Ende. Trag dich hier ein — Zugangslink und Erinnerungen
+            bekommst du danach per Mail.
           </p>
 
-          <WebinarSignupModal />
+          <WebinarSignupForm />
 
           <p className="mt-4 text-xs text-zinc-500">
             100 % kostenlos. Kein Verkaufsgespräch. Jederzeit abmeldbar.
