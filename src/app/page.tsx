@@ -117,7 +117,7 @@ export default function Home() {
           <div className="aspect-[4/5] overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/torsten.jpg"
+              src="/character-21.png"
               alt="Torsten Jaeger"
               className="h-full w-full object-cover object-top"
             />
