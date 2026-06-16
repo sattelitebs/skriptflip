@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { signIn } from "../actions";
-import { AuthShell, AuthInput, AuthSubmit, AuthError } from "../AuthShell";
+import { AuthShell, AuthInput, AuthSubmit, AuthError, AuthInfo } from "../AuthShell";
 
 export const metadata: Metadata = {
   title: "Anmelden – skriptflip",
@@ -9,9 +10,9 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; info?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, info } = await searchParams;
 
   return (
     <AuthShell
@@ -22,6 +23,7 @@ export default async function LoginPage({
       altLinkHref="/register"
     >
       <AuthError message={error} />
+      <AuthInfo message={info} />
       <form action={signIn} className="space-y-5">
         <AuthInput
           label="E-Mail"
@@ -39,6 +41,14 @@ export default async function LoginPage({
         />
         <AuthSubmit>Anmelden</AuthSubmit>
       </form>
+      <p className="mt-4 text-center text-sm">
+        <Link
+          href="/forgot-password"
+          className="text-zinc-400 hover:text-[var(--color-brand)]"
+        >
+          Passwort vergessen?
+        </Link>
+      </p>
     </AuthShell>
   );
 }

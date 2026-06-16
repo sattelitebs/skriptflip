@@ -53,3 +53,52 @@ export async function signOut() {
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    redirect("/forgot-password?error=" + encodeURIComponent("Bitte E-Mail eingeben."));
+  }
+
+  const supabase = await createClient();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/confirm?next=/reset-password`,
+  });
+
+  // Bewusst kein Detail-Error preisgeben (Account-Enumeration-Schutz):
+  // wir zeigen IMMER „Mail unterwegs", auch wenn die Adresse unbekannt ist.
+  if (error) {
+    console.error("[auth] resetPasswordForEmail:", error.message);
+  }
+  redirect("/forgot-password?sent=1");
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+
+  if (password.length < 8) {
+    redirect(
+      "/reset-password?error=" +
+        encodeURIComponent("Passwort muss mindestens 8 Zeichen haben."),
+    );
+  }
+  if (password !== confirm) {
+    redirect(
+      "/reset-password?error=" + encodeURIComponent("Die Passwörter stimmen nicht überein."),
+    );
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    redirect("/reset-password?error=" + encodeURIComponent(error.message));
+  }
+
+  // Nach Update ausloggen, damit User sich frisch mit neuem Passwort einloggt.
+  await supabase.auth.signOut();
+  revalidatePath("/", "layout");
+  redirect("/login?info=" + encodeURIComponent("Passwort geändert. Bitte neu anmelden."));
+}
